@@ -1,0 +1,12 @@
+{
+  "completed": [
+    "levels/default/level1.map", 
+    "levels/default/level2.map", 
+    "levels/tutorials/hello-world.map", 
+    "levels/tutorials/one-way-walls.map"
+  ], 
+  "packages": [
+    "tutorials", 
+    "default"
+  ]
+}
