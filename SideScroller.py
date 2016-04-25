@@ -1,7 +1,9 @@
 import pygame
 
 class Camera(object):
-	'''Class for center screen on the player'''
+	'''
+		Class for center screen on the player
+	'''
 	def __init__(self, surface, player, level_width, level_height, pixes_to_adjust_by):
 		self.player = player
 		self.surface = surface
@@ -61,7 +63,10 @@ class WallOpenDir:
 		return switcher.get(letter, WallOpenDir.NONE);
 				
 class Wall(pygame.sprite.Sprite):
-	'''Class for wall blocks'''
+	'''
+		Class for wall blocks
+		.map file: X, L, R, U, D (with appropriate dirrection)
+	'''
 	def __init__(self, x, y, dir):
 		# Store positional information
 		self.x = x
@@ -78,7 +83,10 @@ class Wall(pygame.sprite.Sprite):
 		self.rect.topleft = [x, y]
 
 class WinBlock(pygame.sprite.Sprite):
-	"""Class for win blocks"""
+	"""
+		Class for "end-game"/"win" blocks 
+		.map file: W
+	"""
 	def __init__(self, x, y):
 		# Store positional information
 		self.x = x
@@ -94,8 +102,32 @@ class WinBlock(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.topleft = [x, y]
 
+class Spawner(pygame.sprite.Sprite):
+	"""
+		Class for spawner blacks 
+		.map file 0-9
+	"""
+	def __init__(self, x, y, power):
+		# Store positional information
+		self.x = x
+		self.y = y
+		
+		# Init the parent class
+		super().__init__()
+		
+		# Get the needed image
+		self.image = pygame.image.load("wall/spawner.png").convert()
+
+		# Store size info about the sprite
+		self.rect = self.image.get_rect()
+		self.rect.topleft = [x, y]
+	
+		
 class Player(pygame.sprite.Sprite):
-	'''class for player and collision'''
+	'''
+		class for player and collision
+		.map file: P
+	'''
 	def __init__(self, x, y):
 		# Call the parent c'tor
 		super().__init__()
@@ -217,12 +249,16 @@ class Player(pygame.sprite.Sprite):
 		return False
 
 class Level(object):
-	'''Read a map and create a level'''
+	'''
+		Read a map and create a level
+		takes a .map file path and creates the appropriate sprites.
+	'''
 	
 	# C'tor
 	def __init__(self, level_file_name):
 		# Initaialize instance variables
 		self.world = []
+		self.spawners = []
 		self.win_blocks = []
 		self.all_sprite = pygame.sprite.Group()
 		self.object_size = 25
@@ -251,10 +287,17 @@ class Level(object):
 					self.player = Player(x,y)
 					self.all_sprite.add(self.player)
 					
+				# "W" is a "win block", a block which completes the level upon touching
 				elif col == "W":
 					win_block = WinBlock(x, y)
 					self.win_blocks.append(win_block)
 					self.all_sprite.add(win_block)
+					
+				# numbers (0-9) are "Bad-Guy" blocks. They spawn bad guys, of relitive difficulty to the number.
+				elif col.isdigit():
+					my_spawner = Spawner(x, y, int(col))
+					self.spawners.append(my_spawner)
+					self.all_sprite.add(my_spawner)
 				
 				# Increment X counter
 				x += self.object_size

@@ -2,6 +2,7 @@
 	"name": "Tutorials",
 	"levels": [
 		{ "name": "Hello World", "map": "hello-world.map" },
-		{ "name": "One Way Walls", "map": "one-way-walls.map" }
+		{ "name": "One Way Walls", "map": "one-way-walls.map" },
+		{ "name": "Bad Guys are Coming!", "map": "bad-guys.map" }
 	]
 }
