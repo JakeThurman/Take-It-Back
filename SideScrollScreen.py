@@ -156,6 +156,8 @@ class SideScrollScreen(Screen):
 		
 		# Initialize key handling
 		self.up = self.down = self.left = self.right = False
+		
+		self.bullets = []
 	
 	# Handles pygame key change events
 	def _handle_key_change(self, key, value):
@@ -180,6 +182,14 @@ class SideScrollScreen(Screen):
 	def handle_key_down(self, key):
 		self._handle_key_change(key, True)
 	
+	def _add_bullet(self, bullet):
+		self.my_level.all_sprite.add(bullet)
+		self.bullets.append(bullet)
+		
+	def _on_bullet_die(self, bullet):
+		self.my_level.all_sprite.remove(bullet)
+		self.bullets.remove(bullet)
+	
 	# Renders a side scoller display
 	def render(self):
 		# Check if the player has one. If they have, 
@@ -202,7 +212,11 @@ class SideScrollScreen(Screen):
 		
 		# Handle updating spawners
 		for spawner in self.my_level.spawners:
-			spawner.update(self.my_level.player, self.my_level.world)
+			spawner.update(self.my_level.player, self.my_level.world, self._add_bullet)
+			
+		# Update any currently flying bullets
+		for bullet in self.bullets:
+			bullet.update(self.my_level.world, self.my_level.player, lambda: self._on_bullet_die(bullet))
 		
 		# Update the camera position
 		self.camera.update()

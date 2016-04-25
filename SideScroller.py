@@ -100,28 +100,62 @@ class WinBlock(Block):
 	def __init__(self, x, y):
 		# Init the parent class
 		super().__init__(x, y, "wall/win_block.png")
-
+		
 class Spawner(Block):
 	"""
-		Class for spawner blacks 
+		Class for weapon blacks 
 		.map file 0-9
 	"""
 	def __init__(self, x, y, power):
 		# Init the parent class
-		super().__init__(x, y, "wall/spawner.png")
+		super().__init__(x, y, "wall/weapon.png")
 		
 		self.dir = WallOpenDir.NONE
 		
 		self.power = power
 	
-	def update(self, player, world):
-		#shoud_fire = random.randint(0, 10 * (10 - self.power)) == 1;
+	def update(self, player, world, add_bullet_func):
+		# Generate a random integer in the range [0, (10 * (10 - power)];
+		shoud_fire = random.randint(0, 10 * (10 - self.power)) == 1;
 		
-		print("checking:::")
-		if lineofsight.can_see(player, self, [block.rect for block in world]):
-			print("Oh shoot!")
+		# If the random number genderation says we should shoot, and we can see the player, shoot!
+		if shoud_fire and lineofsight.can_see(player, self, [block.rect for block in world if block.rect.top <= player.rect.top]):
+			add_bullet_func(Bullet(self.x, self.y, player.rect.left > self.rect.right, random.randint(0, 100)))
+		
+class Bullet(pygame.sprite.Sprite):
+	"""
+		Faster than a speeding bullet...
+		Wait... a moving bullet class.
+		As shot by a "spawner" weapon
+	"""
 	
+	def __init__(self, x, y, right, key):
+		self.key = key
+		# Call the parent c'tor
+		super().__init__()
+
+		# Initialize the positional values
+		self.x = x
+		self.y = y
 		
+		# Get the initial image
+		self.image = pygame.image.load("wall/laser.png").convert()
+		
+		# Store information this sprite's size.
+		self.rect = self.image.get_rect()
+
+		self.direction_is_right = right
+		self.rect.topleft = [x, y]
+		self.HORIZ_MOV_INCR = 10
+	
+	def update(self, world, player, on_die):
+		movx = (1 if self.direction_is_right else -1) * self.HORIZ_MOV_INCR
+		
+		# Check if the player is colliding with any of the map
+		for o in world:
+			if self.rect.colliderect(o) and ((movx > 0 and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.LEFT_ONLY)) or (movx < 0 and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.RIGHT_ONLY))):
+				on_die()
+
 class Player(pygame.sprite.Sprite):
 	'''
 		class for player and collision
@@ -159,31 +193,31 @@ class Player(pygame.sprite.Sprite):
 		# Store information this sprite's size.
 		self.rect = self.image.get_rect()
 
-		self.directionIsRight = True
+		self.direction_is_right = True
 		self.rect.topleft = [x, y]
 		self.HORIZ_MOV_INCR = 10
 
 	def update(self, up, down, left, right, world):	
 		if up:
 			if self.contact:
-				if self.directionIsRight:
+				if self.direction_is_right:
 					self.image = pygame.image.load(self._images.get("jump_right"))
 				self.jump = True
 				self.movy -= 20
 		if down:
-			if self.contact and self.directionIsRight:
+			if self.contact and self.direction_is_right:
 				self.image = pygame.image.load(self._images.get("down_right")).convert_alpha()
-			if self.contact and not self.directionIsRight:
+			if self.contact and not self.direction_is_right:
 				self.image = pygame.image.load(self._images.get("down_left")).convert_alpha()
 		
-		if not down and self.directionIsRight:
+		if not down and self.direction_is_right:
 				self.image = pygame.image.load(self._images.get("idle_right")).convert_alpha()
 		
-		if not down and not self.directionIsRight:
+		if not down and not self.direction_is_right:
 			self.image = pygame.image.load(self._images.get("idle_left")).convert_alpha()
 		
 		if left:
-			self.directionIsRight = False
+			self.direction_is_right = False
 			self.movx = -self.HORIZ_MOV_INCR
 			if self.contact:
 				self.image = pygame.image.load(self._images.get("run_left")).convert_alpha()
@@ -191,7 +225,7 @@ class Player(pygame.sprite.Sprite):
 				self.image = self.image = pygame.image.load(self._images.get("jump_left")).convert_alpha()
 		
 		if right:
-			self.directionIsRight = True
+			self.direction_is_right = True
 			self.movx = +self.HORIZ_MOV_INCR
 			if self.contact:
 				self.image = pygame.image.load(self._images.get("run_right")).convert_alpha()
