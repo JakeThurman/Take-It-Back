@@ -1,4 +1,4 @@
-import pygame
+import pygame, random, lineofsight
 
 class Camera(object):
 	'''
@@ -61,66 +61,65 @@ class WallOpenDir:
 		}
 		# Then return the needed value or this default value if none match.
 		return switcher.get(letter, WallOpenDir.NONE);
-				
-class Wall(pygame.sprite.Sprite):
+			
+class Block(pygame.sprite.Sprite):
+	"""  
+		pygame sprite block base class
+	"""
+	def __init__(self, x, y, file_name):
+		# Store positional information
+		self.x = x
+		self.y = y
+
+		# Init the parent class
+		super().__init__()
+		# Get the needed image
+		self.image = pygame.image.load(file_name).convert()
+
+		# Store size info about the sprite
+		self.rect = self.image.get_rect()
+		self.rect.topleft = [x, y]
+			
+class Wall(Block):
 	'''
 		Class for wall blocks
 		.map file: X, L, R, U, D (with appropriate dirrection)
 	'''
 	def __init__(self, x, y, dir):
-		# Store positional information
-		self.x = x
-		self.y = y
-		self.dir = dir
-
 		# Init the parent class
-		super().__init__()
-		# Get the needed image
-		self.image = pygame.image.load(WallOpenDir.get_file_name(dir)).convert()
+		super().__init__(x, y, WallOpenDir.get_file_name(dir))
 
 		# Store size info about the sprite
-		self.rect = self.image.get_rect()
-		self.rect.topleft = [x, y]
+		self.dir = dir
 
-class WinBlock(pygame.sprite.Sprite):
+class WinBlock(Block):
 	"""
 		Class for "end-game"/"win" blocks 
 		.map file: W
 	"""
 	def __init__(self, x, y):
-		# Store positional information
-		self.x = x
-		self.y = y
-		
 		# Init the parent class
-		super().__init__()
-		
-		# Get the needed image
-		self.image = pygame.image.load("wall/win_block.png").convert()
+		super().__init__(x, y, "wall/win_block.png")
 
-		# Store size info about the sprite
-		self.rect = self.image.get_rect()
-		self.rect.topleft = [x, y]
-
-class Spawner(pygame.sprite.Sprite):
+class Spawner(Block):
 	"""
 		Class for spawner blacks 
 		.map file 0-9
 	"""
 	def __init__(self, x, y, power):
-		# Store positional information
-		self.x = x
-		self.y = y
-		
 		# Init the parent class
-		super().__init__()
+		super().__init__(x, y, "wall/spawner.png")
 		
-		# Get the needed image
-		self.image = pygame.image.load("wall/spawner.png").convert()
-
-		# Store size info about the sprite
-		self.rect = self.image.get_rect()
-		self.rect.topleft = [x, y]
+		self.dir = WallOpenDir.NONE
+		
+		self.power = power
+	
+	def update(self, player, world):
+		#shoud_fire = random.randint(0, 10 * (10 - self.power)) == 1;
+		
+		print("checking:::")
+		if lineofsight.can_see(player, self, [block.rect for block in world]):
+			print("Oh shoot!")
 	
 		
 class Player(pygame.sprite.Sprite):
@@ -164,7 +163,7 @@ class Player(pygame.sprite.Sprite):
 		self.rect.topleft = [x, y]
 		self.HORIZ_MOV_INCR = 10
 
-	def update(self, up, down, left, right, world):
+	def update(self, up, down, left, right, world):	
 		if up:
 			if self.contact:
 				if self.directionIsRight:
@@ -296,6 +295,7 @@ class Level(object):
 				# numbers (0-9) are "Bad-Guy" blocks. They spawn bad guys, of relitive difficulty to the number.
 				elif col.isdigit():
 					my_spawner = Spawner(x, y, int(col))
+					self.world.append(my_spawner)
 					self.spawners.append(my_spawner)
 					self.all_sprite.add(my_spawner)
 				

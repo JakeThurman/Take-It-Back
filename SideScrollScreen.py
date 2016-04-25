@@ -197,8 +197,12 @@ class SideScrollScreen(Screen):
 		# Render all of the level's sprites
 		self.camera.draw_sprites(self.my_level.all_sprite)
 		
-		# Update the player object based of the currently pressed keys
+		# Update the player object based of the currently pressed keys	
 		self.my_level.player.update(self.up, self.down, self.left, self.right, self.my_level.world)
+		
+		# Handle updating spawners
+		for spawner in self.my_level.spawners:
+			spawner.update(self.my_level.player, self.my_level.world)
 		
 		# Update the camera position
 		self.camera.update()

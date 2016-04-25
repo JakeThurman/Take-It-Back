@@ -3,7 +3,9 @@
     "levels/default/level1.map", 
     "levels/default/level2.map", 
     "levels/tutorials/hello-world.map", 
-    "levels/tutorials/one-way-walls.map"
+    "levels/tutorials/one-way-walls.map", 
+    "levels/tutorials/bad-guys.map", 
+    "levels/default/super-easy.map"
   ], 
   "packages": [
     "tutorials", 

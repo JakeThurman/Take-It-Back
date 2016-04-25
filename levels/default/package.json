@@ -2,6 +2,7 @@
 	"name": "Default Levels",
 	"levels": [
 		{ "name": "Level 1", "map": "level1.map" },
-		{ "name": "Level 2", "map": "level2.map" }
+		{ "name": "Level 2", "map": "level2.map" },
+		{ "name": "Super Easy", "map": "super-easy.map" }
 	]
 }
