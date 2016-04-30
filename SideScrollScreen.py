@@ -1,21 +1,57 @@
 # Jacob Thurman
 # Side Scroller Game Screen
 
-import pygame, sys, colors, json, mouseovermenu
-from renderingfactories import *
-from Screen import Screen
-from SideScroller import Level, Camera
+import pygame, sys, colors, json
+from rendering import *
+from screen import Screen
+from sidescrollworld import Level
 from pygame.locals import *
 
 # Constants needed by this file
 class _consts:
-	FPS = 45 # The frames per second we always want to render at.
-	
+	"""SETTINGS"""
+	# The frames per second we always want to render at.
+	FPS = 45
 	# Camera should move by thid number of pixels when it adjusts.
 	# This nubmer should be low enough to dis-allow jerkiness when 
 	# quickly moving up/down, but also low enough to avoid jerking
 	# when the player jumps, and trying to rerender that each time
 	CAMERA_ADJUST_PIXELS = 25 
+	
+	"""LEVEL FILES"""
+	# The folder where levels are stored
+	LEVELS_PREFIX = "levels/"
+	# The path to the data file
+	JSON_DATA_FILE_NAME = "levels/data.json"
+	# The name of a package
+	PACKAGE_JSON_FILE_NAME = "/package.json"
+	
+	"""JSON KEYS"""
+	# data.json: The json key for completed items
+	COMPLETED_LEVELS_KEY = "completed"
+	# data.json: The json key for failed items
+	FAILED_LEVELS_KEY = "failed"
+	# data.json: The json key for all of the packages
+	PACKAGES_KEY = "packages"
+	# package.json: The name of this package
+	PACKAGE_NAME_KEY = "name"
+	# package.json: The levels in this package
+	PACKAGE_LEVELS_KEY = "levels"
+	# package.json: The name of this level
+	LEVEL_NAME_KEY = "name"
+	# package.json: The name of the map file
+	LEVEL_MAP_FILE_KEY = "map"
+	
+#                        \/       /
+# Sprite classes for the /\ and \/ icons on the picker 
+# screeen for failed and completed levels respectfully.
+class FailedIcon(Sprite):
+	def __init__(self, x, y):
+		super().__init__(x, y, "icons/x-mark.png", use_alpha=True)
+
+class CompletedIcon(Sprite):
+	def __init__(self, x, y):
+		super().__init__(x, y, "icons/check.png", use_alpha=True)
 	
 # Helper class, for getting named valus for level links (and header)
 class LevelLine:
@@ -31,20 +67,16 @@ class LevelLine:
 class SideScrollLevelPickerScreen(Screen):
 	"""Handles picking a side scroller game"""
 
-	LEVELS_PREFIX = "levels/"
-	JSON_DATA_FILE_NAME = 'levels/data.json'
-	PACKAGE_JSON_FILE_NAME = "/package.json"
-	
 	# Constructor
 	# NOTE: This c'tor is not a legal Screen.ScreenManger factory
 	def __init__(self, surface, screen_size, set_screen_func):
 		super().__init__()
 		
 		# Create dependencies
-		self.package_text_renderer = mouseovermenu.OptionRenderer(surface, pygame.font.Font(None, 40), do_hover=False)
-		self.level_text_renderer = mouseovermenu.OptionRenderer(surface, pygame.font.SysFont("monospace", 25))
-		self.completed_level_text_renderer = mouseovermenu.OptionRenderer(surface, pygame.font.SysFont("monospace", 25), color=colors.DARK_GREEN, hover_color=colors.PALE_GREEN)
+		self.package_text_renderer = OptionRenderer(surface, pygame.font.Font(None, 40), do_hover=False)
+		self.level_text_renderer = OptionRenderer(surface, pygame.font.SysFont("monospace", 25))
 		self.shape_renderer = ShapeRenderer(surface)
+		self.sprite_renderer = SpriteRenderer(surface)
 		
 		# Store passed in values as needed
 		self._set_screen_func = set_screen_func
@@ -52,7 +84,7 @@ class SideScrollLevelPickerScreen(Screen):
 		
 		# Create links to all the levels we need
 		# First, get all of the level packages we can use
-		with open(self.JSON_DATA_FILE_NAME, "r") as data_file:    
+		with open(_consts.JSON_DATA_FILE_NAME, "r") as data_file:    
 			self.json_data = json.load(data_file)
 			
 		# Here are all the lines for the levels.
@@ -60,20 +92,20 @@ class SideScrollLevelPickerScreen(Screen):
 		self.level_lines = []
 		
 		# Next, add each package
-		for level_package_path in self.json_data["packages"]:
+		for level_package_path in self.json_data[_consts.PACKAGES_KEY]:
 			# Open the package.json file for this folder
-			with open(self.LEVELS_PREFIX + level_package_path + self.PACKAGE_JSON_FILE_NAME) as level_package:
+			with open(_consts.LEVELS_PREFIX + level_package_path + _consts.PACKAGE_JSON_FILE_NAME) as level_package:
 				# Load the package json
 				level_package_data = json.load(level_package)
 				
 				# Create a line for the package header and a blank one for spacing
 				self.level_lines.append(LevelLine("", is_header = True))
-				self.level_lines.append(LevelLine(level_package_data["name"], is_header = True))
+				self.level_lines.append(LevelLine(level_package_data[_consts.PACKAGE_NAME_KEY], is_header = True))
 				
 				# Now create a line for each actual level.
-				for level_data in level_package_data["levels"]:
+				for level_data in level_package_data[_consts.PACKAGE_LEVELS_KEY]:
 					# Add a line for the package name
-					self.level_lines.append(LevelLine(level_data["name"], file_path=self.LEVELS_PREFIX + level_package_path + "/" + level_data["map"]))
+					self.level_lines.append(LevelLine(level_data[_consts.LEVEL_NAME_KEY], file_path=_consts.LEVELS_PREFIX + level_package_path + "/" + level_data[_consts.LEVEL_MAP_FILE_KEY]))
 		
 		# Call the click handler on click!
 		self.set_on_click(self._click_handler)
@@ -93,14 +125,31 @@ class SideScrollLevelPickerScreen(Screen):
 		self._set_screen_func(lambda surface, screen_size: SideScrollScreen(surface, screen_size, clicked.file_path, lambda is_win: self._on_level_complete(is_win, clicked.file_path)))
 	
 	def _on_level_complete(self, is_win, file_path):
-		# Add the file to the completed object
-		if is_win and not file_path in self.json_data["completed"]:
-			self.json_data["completed"].append(file_path)
-			
-			# Dump the json to the save data file
-			with open(self.JSON_DATA_FILE_NAME, 'w') as outfile:
-				json.dump(self.json_data, outfile, indent=2)
+		data_changed= False
 		
+		# Shortcuts!
+		failed = self.json_data[_consts.FAILED_LEVELS_KEY]
+		completed = self.json_data[_consts.COMPLETED_LEVELS_KEY]
+		
+		if is_win:
+			# Add the file to the completed levels array
+			if not file_path in completed:
+				completed.append(file_path)
+				data_changed = True
+				
+			# Remove it from the failed array
+			if file_path in failed:
+				failed.remove(file_path)
+				data_changed = True
+		
+		elif not file_path in completed and not file_path in failed:
+			failed.append(file_path)
+			data_changed = True
+		
+		if data_changed:
+			# Update the data file with new data
+			with open(_consts.JSON_DATA_FILE_NAME, 'w') as outfile:
+				json.dump(self.json_data, outfile, indent=2)
 		
 		# Set the screen to this object
 		self._set_screen_func(lambda surface, screen_size: self)
@@ -111,23 +160,34 @@ class SideScrollLevelPickerScreen(Screen):
 			sys.exit()
 		
 	def render(self):		
-		# Set the backgroud to white
-		self.shape_renderer.render_rect((0, 0, self.screen_size[0], self.screen_size[1]), color=colors.SKY_BLUE)
+		# Set the backgroud color
+		self.shape_renderer.render_rect((0, 0, self.screen_size[0], self.screen_size[1]), color=colors.DARK_GRAY)
 		
 		pygame.mouse.set_visible(True)	# Show the mouse on the levels screen
 		
+		# line-sizing constants
+		INNER_LEFT = 30
+		OUTER_LEFT = 65
+		LINE_HEIGHT = 30
+		
 		# Render each line
 		for i, line in enumerate(self.level_lines):
-			# Get the corrent text renderer
-			if line.is_header:
-				text_renderer = self.package_text_renderer 
-			elif line.el != None and line.file_path in self.json_data["completed"]:
-				text_renderer = self.completed_level_text_renderer
-			else:
-				text_renderer = self.level_text_renderer
+			el_pos = (INNER_LEFT if line.is_header else OUTER_LEFT, i * LINE_HEIGHT)
 			
-			# Finally, render the line, and store the rendered elemenet for click handling
-			line.set_el(text_renderer.render(line.name, (25, i * 30)))
+			# Render the line appropriately
+			if line.is_header:
+				el = self.package_text_renderer.render(line.name, el_pos, color=colors.WHITE)
+			elif line.el != None and line.file_path in self.json_data[_consts.COMPLETED_LEVELS_KEY]:
+				el = self.level_text_renderer.render(line.name, el_pos, color=colors.MID_GREEN, hover_color=colors.PALE_GREEN)
+				self.sprite_renderer.render(CompletedIcon(INNER_LEFT, el_pos[1]))
+			elif line.el != None and line.file_path in self.json_data[_consts.FAILED_LEVELS_KEY]:
+				el = self.level_text_renderer.render(line.name, el_pos, color=colors.RED, hover_color=colors.TOMATO)
+				self.sprite_renderer.render(FailedIcon(INNER_LEFT, el_pos[1]))
+			else:
+				el = self.level_text_renderer.render(line.name, el_pos, color=colors.SILVER)
+			
+			# Finally, store the rendered elemenet for click handling
+			line.set_el(el)
 
 class SideScrollScreen(Screen):
 	"""Handles rendering of the actual side scrolling game"""
@@ -198,7 +258,7 @@ class SideScrollScreen(Screen):
 			self.on_end_func(True) # is_win = True
 			return
 		
-		# Set the backgroud to white
+		# Set the backgroud to sky blue
 		self.shape_renderer.render_rect((0, 0, self.screen_size[0], self.screen_size[1]), color=colors.SKY_BLUE)
 		
 		pygame.mouse.set_visible(False)	# Hide the mouse inside the game		
@@ -216,7 +276,7 @@ class SideScrollScreen(Screen):
 			
 		# Update any currently flying bullets
 		for bullet in self.bullets:
-			bullet.update(self.my_level.world, self.my_level.player, lambda: self._on_bullet_die(bullet))
+			bullet.update(self.my_level.world, self.my_level.player, lambda: self._on_bullet_die(bullet), lambda: self.on_end_func(False)) #self.on_end_func(is_win = false)
 		
 		# Update the camera position
 		self.camera.update()

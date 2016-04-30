@@ -1,13 +1,23 @@
 # Jake Thurman
 # CIS 226 Game Scripting
-# Assignment 3 Graphics Window Output
+# Assignment 3
 # 4/24/16
+
+"""
+	Project Todos:
+		- Bullets aren't firing to the left
+		- Add a health status bar
+		- Consider adding a mini map
+		- Add a "You Won" screen.
+		- Explain the controls somewhere
+"""
+
 
 import pygame, sys
 from pygame.locals import *
-from SplashScreen import SplashScreen
-from SideScrollScreen import SideScrollLevelPickerScreen
-from Screen import ScreenManager
+from splashscreen import SplashScreen
+from sidescrollscreen import SideScrollLevelPickerScreen
+from screen import ScreenManager
 
 def main():
 	pygame.init()

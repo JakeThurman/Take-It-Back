@@ -1,6 +1,6 @@
 import pygame, colors
-from renderingfactories import *
-from Screen import Screen
+from rendering import *
+from screen import Screen
 
 # Renderers the splash screen
 class SplashScreen(Screen):

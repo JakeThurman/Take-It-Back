@@ -1,37 +1,12 @@
+"""
+	Defines Elements for the scroll game.
+"""
+
 import pygame, random, lineofsight
-
-class Camera(object):
-	'''
-		Class for center screen on the player
-	'''
-	def __init__(self, surface, player, level_width, level_height, pixes_to_adjust_by):
-		self.player = player
-		self.surface = surface
-		self.rect = surface.get_rect()
-		self.rect.center = self.player.center
-		self.world_rect = pygame.Rect(0, 0, level_width, level_height)
-		self.pixes_to_adjust_by = pixes_to_adjust_by
-
-	def update(self):
-		if self.player.centerx > self.rect.centerx + self.pixes_to_adjust_by:
-			self.rect.centerx = self.player.centerx - self.pixes_to_adjust_by
-		if self.player.centerx < self.rect.centerx - self.pixes_to_adjust_by:
-			self.rect.centerx = self.player.centerx + self.pixes_to_adjust_by
-		if self.player.centery > self.rect.centery + self.pixes_to_adjust_by:
-			self.rect.centery = self.player.centery - self.pixes_to_adjust_by
-		if self.player.centery < self.rect.centery - self.pixes_to_adjust_by:
-			self.rect.centery = self.player.centery + self.pixes_to_adjust_by
-			self.rect.clamp_ip(self.world_rect)
-
-	def rel_rect(self, actor, camera):
-		return pygame.Rect(actor.rect.x-camera.rect.x, actor.rect.y-camera.rect.y, actor.rect.w, actor.rect.h)
-
-	def draw_sprites(self, sprites):
-		for s in sprites:
-			if s.rect.colliderect(self.rect):
-				self.surface.blit(s.image, self.rel_rect(s, self))
+from rendering import Sprite
 
 class WallOpenDir:
+	# "Enum" constant values.
 	NONE = 0
 	LEFT_ONLY = 1
 	RIGHT_ONLY = 2
@@ -62,25 +37,7 @@ class WallOpenDir:
 		# Then return the needed value or this default value if none match.
 		return switcher.get(letter, WallOpenDir.NONE);
 			
-class Block(pygame.sprite.Sprite):
-	"""  
-		pygame sprite block base class
-	"""
-	def __init__(self, x, y, file_name):
-		# Store positional information
-		self.x = x
-		self.y = y
-
-		# Init the parent class
-		super().__init__()
-		# Get the needed image
-		self.image = pygame.image.load(file_name).convert()
-
-		# Store size info about the sprite
-		self.rect = self.image.get_rect()
-		self.rect.topleft = [x, y]
-			
-class Wall(Block):
+class Wall(Sprite):
 	'''
 		Class for wall blocks
 		.map file: X, L, R, U, D (with appropriate dirrection)
@@ -92,7 +49,7 @@ class Wall(Block):
 		# Store size info about the sprite
 		self.dir = dir
 
-class WinBlock(Block):
+class WinBlock(Sprite):
 	"""
 		Class for "end-game"/"win" blocks 
 		.map file: W
@@ -101,80 +58,67 @@ class WinBlock(Block):
 		# Init the parent class
 		super().__init__(x, y, "wall/win_block.png")
 		
-class Spawner(Block):
+class Spawner(Sprite):
 	"""
 		Class for weapon blacks 
 		.map file 0-9
 	"""
 	def __init__(self, x, y, power):
 		# Init the parent class
-		super().__init__(x, y, "wall/weapon.png")
-		
+		super().__init__(x, y, "wall/weapon.png", use_alpha=True)
+		# Don't let users pass through these blocks
 		self.dir = WallOpenDir.NONE
-		
+		# Store the power
 		self.power = power
 	
 	def update(self, player, world, add_bullet_func):
-		# Generate a random integer in the range [0, (10 * (10 - power)];
+		# Generate a random integer in the range [0, 10 * (10 - power)];
 		shoud_fire = random.randint(0, 10 * (10 - self.power)) == 1;
 		
 		# If the random number genderation says we should shoot, and we can see the player, shoot!
 		if shoud_fire and lineofsight.can_see(player, self, [block.rect for block in world if block.rect.top <= player.rect.top]):
-			add_bullet_func(Bullet(self.x, self.y, player.rect.left > self.rect.right, random.randint(0, 100)))
+			add_bullet_func(Bullet(self.x, self.y, player.rect.left > self.rect.right, self.power))
 		
-class Bullet(pygame.sprite.Sprite):
+class Bullet(Sprite):
 	"""
 		Faster than a speeding bullet...
 		Wait... a moving bullet class.
 		As shot by a "spawner" weapon
 	"""
-	
-	def __init__(self, x, y, right, key):
-		self.key = key
+	def __init__(self, x, y, right, power):
 		# Call the parent c'tor
-		super().__init__()
-
-		# Initialize the positional values
-		self.x = x
-		self.y = y
+		super().__init__(x, y, "wall/laser.png", use_alpha=True)
 		
-		# Get the initial image
-		self.image = pygame.image.load("wall/laser.png").convert()
-		
-		# Store information this sprite's size.
-		self.rect = self.image.get_rect()
-
+		# Store other info
 		self.direction_is_right = right
-		self.rect.topleft = [x, y]
+		self.power = power
 		self.HORIZ_MOV_INCR = 10
 	
-	def update(self, world, player, on_die):
+	# Upodates the bullet, 
+	def update(self, world, player, on_die, on_game_over):
 		movx = (1 if self.direction_is_right else -1) * self.HORIZ_MOV_INCR
 		
-		# Check if the player is colliding with any of the map
-		for o in world:
+		self.rect.right += movx
+			
+		# Check if the bullet has hit the player
+		if player.rect.colliderect(self.rect):
+			on_die()
+			if player.on_attacked(self.power):
+				on_game_over()
+			return
+		
+		# Check if the bullet is colliding with any of the map
+		for o in world:			
 			if self.rect.colliderect(o) and ((movx > 0 and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.LEFT_ONLY)) or (movx < 0 and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.RIGHT_ONLY))):
 				on_die()
+				return
 
-class Player(pygame.sprite.Sprite):
+class Player(Sprite):
 	'''
 		class for player and collision
 		.map file: P
 	'''
-	def __init__(self, x, y):
-		# Call the parent c'tor
-		super().__init__()
-
-		# Initialize the positional values
-		self.movy = 0
-		self.movx = 0
-		self.x = x
-		self.y = y
-
-		# Initialize other locals
-		self.contact = False
-		self.jump = False
-
+	def __init__(self, x, y, initial_health):
 		# Store the names of all of the images
 		self._images =  { 
 			"run_left": "actions/run_left.png",
@@ -186,51 +130,59 @@ class Player(pygame.sprite.Sprite):
 			"down_left": "actions/down_left.png",
 			"down_right": "actions/down_right.png"
 		}
+	
+		# Call the parent c'tor
+		super().__init__(x, y, self._images["idle_right"], use_alpha=True)
 
-		# Get the initial image
-		self.image = pygame.image.load(self._images.get("idle_right")).convert()
-
-		# Store information this sprite's size.
-		self.rect = self.image.get_rect()
-
-		self.direction_is_right = True
-		self.rect.topleft = [x, y]
+		# Initialize movement locals
+		self.movy = 0
+		self.movx = 0
+		self.contact = False
+		self.jump = False
+		self.direction_is_right = True # The player is always moving right intiially
 		self.HORIZ_MOV_INCR = 10
+		
+		# Store the health
+		self.health = initial_health
 
+	def on_attacked(self, ammount):
+		self.health -= ammount
+		return self.health <= 0
+		
 	def update(self, up, down, left, right, world):	
 		if up:
 			if self.contact:
 				if self.direction_is_right:
-					self.image = pygame.image.load(self._images.get("jump_right"))
+					self.change_image(self._images["jump_right"])
 				self.jump = True
 				self.movy -= 20
 		if down:
 			if self.contact and self.direction_is_right:
-				self.image = pygame.image.load(self._images.get("down_right")).convert_alpha()
+				self.change_image(self._images["down_right"])
 			if self.contact and not self.direction_is_right:
-				self.image = pygame.image.load(self._images.get("down_left")).convert_alpha()
+				self.change_image(self._images["down_left"])
 		
 		if not down and self.direction_is_right:
-				self.image = pygame.image.load(self._images.get("idle_right")).convert_alpha()
+			self.change_image(self._images["idle_right"])
 		
 		if not down and not self.direction_is_right:
-			self.image = pygame.image.load(self._images.get("idle_left")).convert_alpha()
+			self.change_image(self._images["idle_left"])
 		
 		if left:
 			self.direction_is_right = False
 			self.movx = -self.HORIZ_MOV_INCR
 			if self.contact:
-				self.image = pygame.image.load(self._images.get("run_left")).convert_alpha()
+				self.change_image(self._images["run_left"])
 			else:
-				self.image = self.image = pygame.image.load(self._images.get("jump_left")).convert_alpha()
+				self.change_image(self._images["jump_left"])
 		
 		if right:
 			self.direction_is_right = True
 			self.movx = +self.HORIZ_MOV_INCR
 			if self.contact:
-				self.image = pygame.image.load(self._images.get("run_right")).convert_alpha()
+				self.change_image(self._images["run_right"])
 			else:
-				self.image = self.image = pygame.image.load(self._images.get("jump_right")).convert_alpha()
+				self.change_image(self._images["jump_right"])
 		
 		if not (left or right):
 			self.movx = 0
@@ -317,7 +269,7 @@ class Level(object):
 				
 				# "P" is rendered as the player (where there head begins)
 				elif col == "P":
-					self.player = Player(x,y)
+					self.player = Player(x,y, 20)
 					self.all_sprite.add(self.player)
 					
 				# "W" is a "win block", a block which completes the level upon touching

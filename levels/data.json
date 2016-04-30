@@ -1,11 +1,10 @@
 {
-  "completed": [
-    "levels/default/level1.map", 
-    "levels/default/level2.map", 
-    "levels/tutorials/hello-world.map", 
-    "levels/tutorials/one-way-walls.map", 
+  "failed": [
     "levels/tutorials/bad-guys.map", 
-    "levels/default/super-easy.map"
+    "levels/tutorials/one-way-walls.map"
+  ], 
+  "completed": [
+    "levels/default/level1.map"
   ], 
   "packages": [
     "tutorials", 

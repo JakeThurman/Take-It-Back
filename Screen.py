@@ -1,6 +1,7 @@
 # Jake Thurman
 # CIS-226 Game Scripting
 # Screen Helper Classes
+
 class Screen:
 	'''Handles common screen actions'''
 	def __init__(self):
