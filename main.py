@@ -5,11 +5,11 @@
 
 """
 	Project Todos:
-		- Bullets aren't firing to the left
 		- Add a health status bar
 		- Consider adding a mini map
 		- Add a "You Won" screen.
 		- Explain the controls somewhere
+		- Conider adding an in game level designer
 """
 
 

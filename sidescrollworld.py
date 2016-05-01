@@ -16,26 +16,29 @@ class WallOpenDir:
 	# Gets a file image from a wall direction
 	def get_file_name(dir):
 		# We start with a map object...
-		switcher = {
-			1: "wall/left_only.png",
-			2: "wall/right_only.png",
-			3: "wall/up_only.png",
-			4: "wall/down_only.png",
+		map = {
+			WallOpenDir.NONE: "wall/wall.png",
+			WallOpenDir.LEFT_ONLY: "wall/left_only.png",
+			WallOpenDir.RIGHT_ONLY: "wall/right_only.png",
+			WallOpenDir.UP_ONLY: "wall/up_only.png",
+			WallOpenDir.DOWN_ONLY: "wall/down_only.png",
 		}
-		# Then return the needed value or this default value if none match.
-		return switcher.get(dir, "wall/wall.png")
+		# Then return the needed value.
+		return map[dir]
 		
 	# Returns a WallOpenDir value from a letter key
 	def of(letter):
-		# We start with a map object...
-		switcher = {
+		# Maps .map file characters to the appropriate direction...
+		map = {
 			"R": WallOpenDir.RIGHT_ONLY,
 			"L": WallOpenDir.LEFT_ONLY,
 			"D": WallOpenDir.DOWN_ONLY,
-			"U": WallOpenDir.UP_ONLY
+			"U": WallOpenDir.UP_ONLY,
+			"X": WallOpenDir.NONE
 		}
-		# Then return the needed value or this default value if none match.
-		return switcher.get(letter, WallOpenDir.NONE);
+	
+		# Then return the needed value.
+		return map[letter];
 			
 class Wall(Sprite):
 	'''
@@ -71,13 +74,17 @@ class Spawner(Sprite):
 		# Store the power
 		self.power = power
 	
-	def update(self, player, world, add_bullet_func):
+	def update(self, player, world, add_entity_func):
 		# Generate a random integer in the range [0, 10 * (10 - power)];
-		shoud_fire = random.randint(0, 10 * (10 - self.power)) == 1;
+		should_fire = random.randint(0, 10 * (10 - self.power)) == 1;
 		
 		# If the random number genderation says we should shoot, and we can see the player, shoot!
-		if shoud_fire and lineofsight.can_see(player, self, [block.rect for block in world if block.rect.top <= player.rect.top]):
-			add_bullet_func(Bullet(self.x, self.y, player.rect.left > self.rect.right, self.power))
+		if should_fire:
+			dir = lineofsight.get_direction(player, self, world)
+			
+			if dir != lineofsight.CANT_SEE:
+				is_right = dir == lineofsight.RIGHT
+				add_entity_func(Bullet(self.rect.right if is_right else self.rect.left, self.rect.center[1], is_right, self, self.power))
 		
 class Bullet(Sprite):
 	"""
@@ -85,20 +92,22 @@ class Bullet(Sprite):
 		Wait... a moving bullet class.
 		As shot by a "spawner" weapon
 	"""
-	def __init__(self, x, y, right, power):
+	def __init__(self, x, y, right, maker, power):
 		# Call the parent c'tor
 		super().__init__(x, y, "wall/laser.png", use_alpha=True)
 		
 		# Store other info
 		self.direction_is_right = right
+		self.maker = maker
 		self.power = power
 		self.HORIZ_MOV_INCR = 10
 	
 	# Upodates the bullet, 
 	def update(self, world, player, on_die, on_game_over):
-		movx = (1 if self.direction_is_right else -1) * self.HORIZ_MOV_INCR
-		
-		self.rect.right += movx
+		if self.direction_is_right:
+			self.rect.right += self.HORIZ_MOV_INCR
+		else:
+			self.rect.right -= self.HORIZ_MOV_INCR
 			
 		# Check if the bullet has hit the player
 		if player.rect.colliderect(self.rect):
@@ -106,19 +115,43 @@ class Bullet(Sprite):
 			if player.on_attacked(self.power):
 				on_game_over()
 			return
+			
+		if self.direction_is_right:
+			print("updated:", (self.x, self.y))
 		
 		# Check if the bullet is colliding with any of the map
-		for o in world:			
-			if self.rect.colliderect(o) and ((movx > 0 and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.LEFT_ONLY)) or (movx < 0 and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.RIGHT_ONLY))):
+		for o in world:
+			# This is a fairly complex if statement, and I'm sorry for that :P
+			# The purpose of this check is this, it checks that the object 
+			# needs to be checked becuase bullet cannot pass through it, and 
+			# in that case that the bullet has not collided with it. Finally,
+			# it checks that the block also not the very weapon that fired the bullet
+			if type(o) != self.maker and ((not self.direction_is_right and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.LEFT_ONLY)) or (self.direction_is_right and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.RIGHT_ONLY))) and self.rect.colliderect(o):
+				if self.direction_is_right:
+					print("died:", (self.x, self.y))
+				
 				on_die()
 				return
 
-class Player(Sprite):
+class Player(pygame.sprite.Sprite):
 	'''
 		class for player and collision
 		.map file: P
 	'''
 	def __init__(self, x, y, initial_health):
+		# Call the parent c'tor
+		super().__init__()
+
+		# Initialize the positional values
+		self.movy = 0
+		self.movx = 0
+		self.x = x
+		self.y = y
+
+		# Initialize other locals
+		self.contact = False
+		self.jump = False
+
 		# Store the names of all of the images
 		self._images =  { 
 			"run_left": "actions/run_left.png",
@@ -130,16 +163,16 @@ class Player(Sprite):
 			"down_left": "actions/down_left.png",
 			"down_right": "actions/down_right.png"
 		}
-	
-		# Call the parent c'tor
-		super().__init__(x, y, self._images["idle_right"], use_alpha=True)
 
-		# Initialize movement locals
-		self.movy = 0
-		self.movx = 0
-		self.contact = False
-		self.jump = False
-		self.direction_is_right = True # The player is always moving right intiially
+		# Get the initial image
+		self.image = pygame.image.load(self._images["idle_right"]).convert_alpha()
+
+		# Store information this sprite's size.
+		self.rect = self.image.get_rect()
+		self.rect.topleft = [x, y]
+
+		# Store the intiial direction as right, and the move increment constant
+		self.direction_is_right = True
 		self.HORIZ_MOV_INCR = 10
 		
 		# Store the health
@@ -153,36 +186,36 @@ class Player(Sprite):
 		if up:
 			if self.contact:
 				if self.direction_is_right:
-					self.change_image(self._images["jump_right"])
+					self.image = pygame.image.load(self._images["jump_right"]).convert_alpha()
 				self.jump = True
 				self.movy -= 20
 		if down:
 			if self.contact and self.direction_is_right:
-				self.change_image(self._images["down_right"])
+				self.image = pygame.image.load(self._images["down_right"]).convert_alpha()
 			if self.contact and not self.direction_is_right:
-				self.change_image(self._images["down_left"])
+				self.image = pygame.image.load(self._images["down_left"]).convert_alpha()
 		
 		if not down and self.direction_is_right:
-			self.change_image(self._images["idle_right"])
+				self.image = pygame.image.load(self._images["idle_right"]).convert_alpha()
 		
 		if not down and not self.direction_is_right:
-			self.change_image(self._images["idle_left"])
+			self.image = pygame.image.load(self._images["idle_left"]).convert_alpha()
 		
 		if left:
 			self.direction_is_right = False
 			self.movx = -self.HORIZ_MOV_INCR
 			if self.contact:
-				self.change_image(self._images["run_left"])
+				self.image = pygame.image.load(self._images["run_left"]).convert_alpha()
 			else:
-				self.change_image(self._images["jump_left"])
+				self.image = self.image = pygame.image.load(self._images["jump_left"]).convert_alpha()
 		
 		if right:
 			self.direction_is_right = True
 			self.movx = +self.HORIZ_MOV_INCR
 			if self.contact:
-				self.change_image(self._images["run_right"])
+				self.image = pygame.image.load(self._images["run_right"]).convert_alpha()
 			else:
-				self.change_image(self._images["jump_right"])
+				self.image = self.image = pygame.image.load(self._images["jump_right"]).convert_alpha()
 		
 		if not (left or right):
 			self.movx = 0
