@@ -2,13 +2,16 @@
 # CIS-226 Game Scripting
 # Screen Helper Classes
 
+import pygame, sys
+from pygame.locals import K_ESCAPE
+
 class Screen:
 	'''Handles common screen actions'''
 	def __init__(self):
 		# Set the click function to a dummy lambda by default
 		self.click_func = lambda: None
 	
-	def render(self):
+	def render(self, refresh_time):
 		raise NotImplementedError("render has no impl")
 	
 	def set_on_click(self, click_func):
@@ -22,7 +25,9 @@ class Screen:
 		pass
 	
 	def handle_key_up(self, key):
-		pass
+		if key == K_ESCAPE:
+			pygame.quit()
+			sys.exit()
 		
 class ScreenManager:
 	'''Super simple helper to manage different screeens with common pass through methods.'''
@@ -37,24 +42,26 @@ class ScreenManager:
 	def set(self, factory):
 		# Create the new screen
 		self.curr = factory(self.surface, self.screen_size)
-	
-	# Returns the current screen instance
-	def get(self):
-		return self.curr
+		# Throw an exception if the factory returned an invalid result
+		assert self.curr != None
 	
 	# Pass through methods :::
-	def render(self):
-		if self.curr != None:
-			self.curr.render()
+	def render(self, refresh_time):
+		assert self.curr != None
+		self.curr.render(refresh_time)
+	
+	def set_on_click(self, handler):
+		assert self.curr != None
+		self.curr.set_on_click(handler)
 			
 	def handle_click(self):
-		if self.curr != None:
-			self.curr.handle_click()
+		assert self.curr != None
+		self.curr.handle_click()
 	
 	def handle_key_down(self, key):
-		if self.curr != None:
-			self.curr.handle_key_down(key)
+		assert self.curr != None
+		self.curr.handle_key_down(key)
 			
 	def handle_key_up(self, key):
-		if self.curr != None:
-			self.curr.handle_key_up(key)
+		assert self.curr != None
+		self.curr.handle_key_up(key)

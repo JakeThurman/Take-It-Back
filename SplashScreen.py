@@ -6,13 +6,12 @@ from screen import Screen
 class SplashScreen(Screen):
 	# Constructor
 	def __init__(self, surface, screen_size):
-		super().__init__()
 		self.text_renderer = TextRenderer(colors.BLACK, 25, surface, pygame.font.SysFont("monospace", 15))
 		self.shape_renderer = ShapeRenderer(surface)
 		self.screen_size = screen_size
 	
 	# Renderers the splash screen 
-	def render(self):
+	def render(self, refresh_time):
 		# Set the backgroud to white
 		self.shape_renderer.render_rect((0, 0 , self.screen_size[0], self.screen_size[1]), color=colors.WHITE)
 		
@@ -26,7 +25,7 @@ class SplashScreen(Screen):
 		self.text_renderer.render('and other various obstacles. It will be a simple,', 8)
 		self.text_renderer.render('fun game to waste time and give players a sense', 9)
 		self.text_renderer.render('of accomplishment.', 10)
-		self.text_renderer.render('CLICK to play a prototype!', 12)
+		self.text_renderer.render('CLICK ANYWHERE TO PLAY!', 12)
 		
 		screen_x, screen_y = self.screen_size
 		

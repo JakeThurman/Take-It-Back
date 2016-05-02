@@ -5,11 +5,13 @@
 
 """
 	Project Todos:
-		- Add a health status bar
-		- Consider adding a mini map
-		- Add a "You Won" screen.
 		- Explain the controls somewhere
-		- Conider adding an in game level designer
+	
+	Project Ideas:
+		- Mini map
+		- In game level designer
+		- Package import ???
+		- High Score system
 """
 
 
@@ -19,7 +21,7 @@ from splashscreen import SplashScreen
 from sidescrollscreen import SideScrollLevelPickerScreen
 from screen import ScreenManager
 
-def main():
+def main(FPS):
 	pygame.init()
 	
 	# Initialize the window
@@ -39,10 +41,13 @@ def main():
 	# We then tell the screen that when we click it, (set_on_click) to call our lambda.
 	# that lambda gives the manager a new screen using manager.set. The lambda that we pass in there
 	# is a factory to create a new SideScrollLevelPickerScreen with those two parameters.
-	manager.get().set_on_click(lambda: manager.set(lambda surf, size: SideScrollLevelPickerScreen(surf, size, manager.set)))
+	manager.set_on_click(lambda: manager.set(lambda surf, size: SideScrollLevelPickerScreen(surf, size, manager.set)))
+	
+	# FPS manager
+	clock = pygame.time.Clock()
 	
 	# Run the "game loop"
-	while True:		
+	while True:	
 		# Get any current events
 		for event in pygame.event.get():
 			# If this is a quit event
@@ -57,10 +62,16 @@ def main():
 			elif event.type == KEYUP:
 				manager.handle_key_up(event.key)			
 		
+		# Tell the pygame clock what we want the FPS to be
+		# this in turn responds with the time since the  
+		# last frame update which we provide to render().
+		refresh_time = clock.tick(FPS) 
+		
 		# Refresh the display as needed
-		manager.render()
+		manager.render(refresh_time)
 		pygame.display.update()
 
 # Run the Script!
 if __name__ == '__main__':
-	main()
+	FPS = 45 # The constant refresh time
+	main(FPS)

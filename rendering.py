@@ -11,12 +11,18 @@ class ShapeRenderer:
 		self.surface = surface
 		
 	# Draws a pygame circle
-	def render_circle(self, pos, r, color = None):
+	def render_circle(self, pos, r, color=None):
 		pygame.draw.circle(self.surface, color, pos, r, 0)
 		
 	# Draws a pygame rectangle
-	def render_rect(self, coords, color = None):
-		pygame.draw.rect(self.surface, color, coords)
+	def render_rect(self, coords, color=None, alpha=None):
+		if alpha == None:
+			pygame.draw.rect(self.surface, color, coords) # Draw a basic rectangle
+		else:
+			s = pygame.Surface((coords[2] - coords[0], coords[3] - coords[1]))            # the size of the rect
+			s.set_alpha(alpha)                           # alpha level
+			s.fill(color)                                # this fills the entire surface
+			self.surface.blit(s, (coords[0], coords[1])) # (0,0) are the top-left coordinates
 		
 class TextRenderer:
 	"""Helper class so that I can add text in one line instead of a bunch!"""
@@ -29,7 +35,7 @@ class TextRenderer:
 		self.font = font
 
 	# Renders a block of text to a given row on the display
-	def render(self, text, row, underline = False):
+	def render(self, text, row, underline=False):
 		# Set optional underline property on font object
 		self.font.set_underline(underline)	
 		# Creates a text object
@@ -46,7 +52,6 @@ class OptionRenderer:
 	"""Basically TextRenderer but this handles hovering automatically"""
 	
 	# Constructor
-	# TODO: colors should probable be input to render.
 	def __init__(self, surface, font, do_hover=True):
 		self.font = font
 		self.surface = surface

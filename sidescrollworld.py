@@ -65,7 +65,7 @@ class Spawner(Sprite):
 	"""
 		Class for weapon blacks 
 		.map file 0-9
-	"""
+	"""	
 	def __init__(self, x, y, power):
 		# Init the parent class
 		super().__init__(x, y, "wall/weapon.png", use_alpha=True)
@@ -73,10 +73,19 @@ class Spawner(Sprite):
 		self.dir = WallOpenDir.NONE
 		# Store the power
 		self.power = power
+		# Store the fire interval
+		self.min_fire_interval = 80 * (10 - power)
+		# Say that we are halfway through our wait to fire initially.
+		self.last_fire_ticks = (self.min_fire_interval / 2)
 	
-	def update(self, player, world, add_entity_func):
-		# Generate a random integer in the range [0, 10 * (10 - power)];
-		should_fire = random.randint(0, 10 * (10 - self.power)) == 1;
+	def update(self, refresh_time, player, world, add_entity_func):
+		# Increment the wait counter with the time since the last update
+		self.last_fire_ticks += refresh_time
+		
+		# If we haven't waited long enough, we don't want to fire. Then, check 
+		# a randomly generated integer in the range [0, 10 * (10 - power)]; if
+		# that randomly returns 1, we want to fire
+		should_fire = self.last_fire_ticks > self.min_fire_interval and random.randint(0, 10 * (10 - self.power)) == 1;
 		
 		# If the random number genderation says we should shoot, and we can see the player, shoot!
 		if should_fire:
@@ -85,13 +94,19 @@ class Spawner(Sprite):
 			if dir != lineofsight.CANT_SEE:
 				is_right = dir == lineofsight.RIGHT
 				add_entity_func(Bullet(self.rect.right if is_right else self.rect.left, self.rect.center[1], is_right, self, self.power))
+				self.last_fire_ticks = 0 # Reset the wait counter
 		
-class Bullet(Sprite):
+class Bullet(Sprite):	
 	"""
 		Faster than a speeding bullet...
 		Wait... a moving bullet class.
 		As shot by a "spawner" weapon
 	"""
+	# Constants
+	HORIZ_MOV_INCR = 10
+	MAX_LIFETIME_MS = 700
+	
+	# C'tor
 	def __init__(self, x, y, right, maker, power):
 		# Call the parent c'tor
 		super().__init__(x, y, "wall/laser.png", use_alpha=True)
@@ -100,24 +115,28 @@ class Bullet(Sprite):
 		self.direction_is_right = right
 		self.maker = maker
 		self.power = power
-		self.HORIZ_MOV_INCR = 10
+		self.lifetime = 0
 	
 	# Upodates the bullet, 
-	def update(self, world, player, on_die, on_game_over):
+	def update(self, refresh_time, world, player, on_die, on_game_over):
+		self.lifetime += refresh_time
+		
+		# If this bullet has lasted for more than {MAX_LIFETIME_MS}, kill it now
+		if self.lifetime > Bullet.MAX_LIFETIME_MS:
+			on_die()
+			return
+	
 		if self.direction_is_right:
-			self.rect.right += self.HORIZ_MOV_INCR
+			self.rect.right += Bullet.HORIZ_MOV_INCR
 		else:
-			self.rect.right -= self.HORIZ_MOV_INCR
-			
+			self.rect.right -= Bullet.HORIZ_MOV_INCR
+		
 		# Check if the bullet has hit the player
 		if player.rect.colliderect(self.rect):
 			on_die()
 			if player.on_attacked(self.power):
 				on_game_over()
 			return
-			
-		if self.direction_is_right:
-			print("updated:", (self.x, self.y))
 		
 		# Check if the bullet is colliding with any of the map
 		for o in world:
@@ -127,9 +146,6 @@ class Bullet(Sprite):
 			# in that case that the bullet has not collided with it. Finally,
 			# it checks that the block also not the very weapon that fired the bullet
 			if type(o) != self.maker and ((not self.direction_is_right and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.LEFT_ONLY)) or (self.direction_is_right and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.RIGHT_ONLY))) and self.rect.colliderect(o):
-				if self.direction_is_right:
-					print("died:", (self.x, self.y))
-				
 				on_die()
 				return
 
@@ -138,6 +154,10 @@ class Player(pygame.sprite.Sprite):
 		class for player and collision
 		.map file: P
 	'''
+	# Constants
+	HORIZ_MOV_INCR = 10
+	
+	# C'tor
 	def __init__(self, x, y, initial_health):
 		# Call the parent c'tor
 		super().__init__()
@@ -173,10 +193,10 @@ class Player(pygame.sprite.Sprite):
 
 		# Store the intiial direction as right, and the move increment constant
 		self.direction_is_right = True
-		self.HORIZ_MOV_INCR = 10
 		
 		# Store the health
 		self.health = initial_health
+		self.initial_health = initial_health
 
 	def on_attacked(self, ammount):
 		self.health -= ammount
@@ -203,7 +223,7 @@ class Player(pygame.sprite.Sprite):
 		
 		if left:
 			self.direction_is_right = False
-			self.movx = -self.HORIZ_MOV_INCR
+			self.movx = -Player.HORIZ_MOV_INCR
 			if self.contact:
 				self.image = pygame.image.load(self._images["run_left"]).convert_alpha()
 			else:
@@ -211,7 +231,7 @@ class Player(pygame.sprite.Sprite):
 		
 		if right:
 			self.direction_is_right = True
-			self.movx = +self.HORIZ_MOV_INCR
+			self.movx = Player.HORIZ_MOV_INCR
 			if self.contact:
 				self.image = pygame.image.load(self._images["run_right"]).convert_alpha()
 			else:
@@ -273,13 +293,14 @@ class Level(object):
 	'''
 	
 	# C'tor
-	def __init__(self, level_file_name):
+	def __init__(self, level_file_name, player_health):
 		# Initaialize instance variables
 		self.world = []
 		self.spawners = []
 		self.win_blocks = []
 		self.all_sprite = pygame.sprite.Group()
 		self.object_size = 25
+		self.player_health = player_health
 		
 		# Takes all of the lines from the level file and caches them
 		with open(level_file_name, "r") as level_file:
@@ -302,7 +323,7 @@ class Level(object):
 				
 				# "P" is rendered as the player (where there head begins)
 				elif col == "P":
-					self.player = Player(x,y, 20)
+					self.player = Player(x, y, self.player_health)
 					self.all_sprite.add(self.player)
 					
 				# "W" is a "win block", a block which completes the level upon touching

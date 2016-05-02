@@ -1,11 +1,9 @@
 {
   "failed": [
-    "levels/default/level3.map"
+    "levels/default/level3.map", 
+    "levels/default/level2.map"
   ], 
   "completed": [
-    "levels/default/level1.map", 
-    "levels/tutorials/one-way-walls.map", 
-    "levels/tutorials/bad-guys.map", 
     "levels/tutorials/hello-world.map", 
     "levels/default/super-easy.map"
   ], 
