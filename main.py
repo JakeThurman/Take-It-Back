@@ -4,13 +4,12 @@
 # 4/24/16
 
 """
-	Project Todos:
-		- Explain the controls somewhere
-	
 	Project Ideas:
+		- Add locked/unlocked levels (unlocks property on object in package.json containing more levels?)
+		- Explain the controls somewhere
+		- Pathfinding baddies (http://eli.thegreenplace.net/2009/01/09/writing-a-game-in-python-with-pygame-part-iii)
 		- Mini map
 		- In game level designer
-		- Package import ???
 		- High Score system
 """
 
