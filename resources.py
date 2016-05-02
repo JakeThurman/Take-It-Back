@@ -1,3 +1,6 @@
+# main
+GAME_TITLE = "Take It Back"
+
 # End Game Screen
 YOU_WON = "Congratulations, You won!"
 YOU_LOST = "Better luck next time..."

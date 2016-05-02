@@ -15,7 +15,7 @@
 """
 
 
-import pygame, sys
+import pygame, sys, resources
 from pygame.locals import *
 from splashscreen import SplashScreen
 from sidescrollscreen import SideScrollLevelPickerScreen
@@ -27,7 +27,7 @@ def main(FPS):
 	# Initialize the window
 	screen_size = (700, 500)
 	DISPLAYSURF = pygame.display.set_mode(screen_size, 0, 32)
-	pygame.display.set_caption('Take It Back')
+	pygame.display.set_caption(resources.GAME_TITLE)
 	
 	# Create a screen manager object
 	# This will handle switching from screen to screen for us
