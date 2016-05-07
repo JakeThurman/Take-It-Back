@@ -4,20 +4,37 @@
 # 4/24/16
 
 """
-	Project Ideas:
-		- Add locked/unlocked levels (unlocks property on object in package.json containing more levels?)
-		- Explain the controls somewhere
-		- Pathfinding baddies (http://eli.thegreenplace.net/2009/01/09/writing-a-game-in-python-with-pygame-part-iii)
-		- Mini map
-		- In game level designer
-		- High Score system
+	Project TODOs/Ideas:
+		- BUGS:
+			- Baddie movement calculation is just awful
+		
+		- Add locked/unlocked levels 
+			- Locked levels are crossed out
+			- Property on JSON object for level of key "unlocks" which is an array of .map file names
+		
+		- Add quit buttons 
+			- GameOverScreen
+			- SideScrollLevelPickerScreen
+			- PauseMenuScreen
+		
+		- Make ESCAPE button from level screen go to pause screen instead of QUIT (PauseMenuScreen)
+			- Add "Resume" button 
+			- "Play again" changed to "Restart"
+		
+		- Add "?" or "HELP" buttom 
+			- SideScrollLevelPickerScreen
+			- PauseMenuScreen
+		
+		- Add mini map at bottom right
+		
+		- Make level picker screen scroll
 """
 
 
 import pygame, sys, resources
 from pygame.locals import *
 from splashscreen import SplashScreen
-from sidescrollscreen import SideScrollLevelPickerScreen
+from levelpickerscreen import LevelPickerScreen
 from screen import ScreenManager
 
 def main(FPS):
@@ -40,7 +57,7 @@ def main(FPS):
 	# We then tell the screen that when we click it, (set_on_click) to call our lambda.
 	# that lambda gives the manager a new screen using manager.set. The lambda that we pass in there
 	# is a factory to create a new SideScrollLevelPickerScreen with those two parameters.
-	manager.set_on_click(lambda: manager.set(lambda surf, size: SideScrollLevelPickerScreen(surf, size, manager.set)))
+	manager.set_on_click(lambda: manager.set(lambda surf, size: LevelPickerScreen(surf, size, manager.set)))
 	
 	# FPS manager
 	clock = pygame.time.Clock()
@@ -54,6 +71,7 @@ def main(FPS):
 				# Quit pygame and then the whole program
 				pygame.quit()
 				sys.exit()
+			# Propigate mouse events to the screen manager
 			elif event.type == MOUSEBUTTONDOWN:
 				manager.handle_click()
 			elif event.type == KEYDOWN:

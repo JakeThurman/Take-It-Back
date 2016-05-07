@@ -6,8 +6,13 @@ from screen import Screen
 class SplashScreen(Screen):
 	# Constructor
 	def __init__(self, surface, screen_size):
+		super().__init__()
+		
+		# Create dependencies
 		self.text_renderer = TextRenderer(colors.BLACK, 25, surface, pygame.font.SysFont("monospace", 15))
 		self.shape_renderer = ShapeRenderer(surface)
+		
+		# Store settings
 		self.screen_size = screen_size
 	
 	# Renderers the splash screen 

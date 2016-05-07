@@ -3,6 +3,8 @@
 	"levels": [
 		{ "name": "Hello World", "map": "hello-world.map" },
 		{ "name": "One Way Walls", "map": "one-way-walls.map" },
-		{ "name": "Bad Guys are Coming!", "map": "bad-guys.map" }
+		{ "name": "Bad Guys are Coming!", "map": "bad-guys.map" },
+		{ "name": "Have a Healthy Snack", "map": "med-pack.map" },
+		{ "name": "Ring Around the Rosie", "map": "ring-around-the-rosie.map" }
 	]
 }
