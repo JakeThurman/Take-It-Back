@@ -141,7 +141,7 @@ class LevelPickerScreen(Screen):
 					# Get the full path for the map files this level unlocks
 					unlocks = []
 					for map_file in level_data.get(_consts.LEVEL_UNLOCKS_KEY, []):
-						unlocks.append(_consts.LEVELS_PREFIX + level_package_path + map_file)
+						unlocks.append(_consts.LEVELS_PREFIX + level_package_path + "/" + map_file)
 					
 					# Add a line for the level name
 					self.level_lines.append(LevelLine(level_data[_consts.LEVEL_NAME_KEY], file_path=file_path, player_health=player_health, locked=locked, unlocks=unlocks))
@@ -151,7 +151,7 @@ class LevelPickerScreen(Screen):
 	
 	def _click_handler(self):			
 		# Find the element that is at that position
-		clicked = [ll for ll in self.level_lines if not ll.is_header and not ll.locked and ll.el.is_hovered]
+		clicked = [ll for ll in self.level_lines if not ll.is_header and ll.el.is_hovered and (not ll.locked or ll.file_path in self.json_data[_consts.UNLOCKED_LEVELS_KEY])]
 		
 		# If the user didn't click on anything, don't do anything
 		if len(clicked) != 1:
@@ -160,11 +160,11 @@ class LevelPickerScreen(Screen):
 		# Now, we only want to keep arround that single element
 		clicked = clicked[0]
 		
-		self._play_level(clicked.file_path, clicked.player_health)
+		self._play_level(clicked.file_path, clicked.player_health, clicked.unlocks)
 		
-	def _play_level(self, file_path, total_health):
+	def _play_level(self, file_path, total_health, unlocks):
 		def win(total_rings, my_rings, my_health):
-			self._on_level_won(file_path, total_rings, my_rings, total_health, my_health)
+			self._on_level_won(file_path, total_rings, my_rings, total_health, my_health, unlocks)
 		def lose():
 			self._on_level_lost(file_path, total_health)
 	
@@ -175,7 +175,7 @@ class LevelPickerScreen(Screen):
 		# Set the screen to this object
 		self._set_screen_func(lambda surface, screen_size: self)
 		
-	def _on_level_won(self, file_path, total_rings, my_rings, total_health, my_health):
+	def _on_level_won(self, file_path, total_rings, my_rings, total_health, my_health, unlocks):
 		data_changed = False
 		
 		# Shortcut names
@@ -195,6 +195,12 @@ class LevelPickerScreen(Screen):
 			failed.remove(file_path)
 			data_changed = True
 			
+		# Record all of the levels this unlocks as unlocked
+		for map_path in unlocks:
+			if map_path not in self.json_data[_consts.UNLOCKED_LEVELS_KEY]:
+				self.json_data[_consts.UNLOCKED_LEVELS_KEY].append(map_path)
+				data_changed = True
+		
 		# Update the data file if need be
 		if data_changed:
 			self._dump_data_file()
@@ -238,9 +244,7 @@ class LevelPickerScreen(Screen):
 		
 		# The completeion percentage is the average of the two percentages
 		return int((ring_percentage + health_percentage)/2)
-	
-	HIT = False
-	
+		
 	def render(self, refresh_time):
 		# Set the backgroud color
 		self.shape_renderer.render_rect((0, 0, self.screen_size[0], self.screen_size[1]), color=colors.DARK_GRAY)
@@ -289,5 +293,3 @@ class LevelPickerScreen(Screen):
 			
 			# Finally, store the rendered elemenet for click handling
 			line.set_el(el)
-		
-		self.HIT = True
