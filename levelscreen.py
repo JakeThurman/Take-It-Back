@@ -2,11 +2,18 @@
 # Jacob Thurman
 # Side Scroller Game Screen
 
-import pygame, sys, colors, json, resources, _consts
+import pygame, sys, colors, json, resources
 from rendering import *
 from screen import Screen
 from world import Level, Ring
 from pygame.locals import *
+
+class _settings:
+	# Camera should move by thid number of pixels when it adjusts.
+	# This nubmer should be low enough to dis-allow jerkiness when 
+	# quickly moving up/down, but also low enough to avoid jerking
+	# when the player jumps, and trying to rerender that each time
+	CAMERA_ADJUST_PIXELS = 25 
 
 class HealthBar:
 	"""The side scroll game status bar"""
@@ -73,7 +80,7 @@ class LevelScreen(Screen):
 		
 		# Create a camera object
 		level_size = self.my_level.get_size()
-		self.camera = Camera(surface, self.my_level.player.rect, level_size[0], level_size[1], _consts.CAMERA_ADJUST_PIXELS)
+		self.camera = Camera(surface, self.my_level.player.rect, level_size[0], level_size[1], _settings.CAMERA_ADJUST_PIXELS)
 		
 		# Create a overlay renderers
 		self.health_bar = HealthBar(surface, screen_size, self.my_level.player)
@@ -155,7 +162,7 @@ class LevelScreen(Screen):
 			self.health_bar.render()
 			
 		if self.my_level.total_stars != 0:
-			self.level_rings.render(self.screen_size[0], 0, self.my_level.total_stars, self.my_level.stars)
+			self.level_rings.render(self.screen_size[0] - self.screen_size[0]/64, self.screen_size[1]/64, self.my_level.total_stars, self.my_level.stars)
 		
 		# Update the pygame display
 		pygame.display.flip()

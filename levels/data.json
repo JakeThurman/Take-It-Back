@@ -1,6 +1,7 @@
 {
   "failed": [
-    "levels/tutorials/one-way-walls.map"
+    "levels/tutorials/one-way-walls.map", 
+    "levels/default/level2.map"
   ], 
   "completed": {
     "levels/tutorials/hello-world.map": {

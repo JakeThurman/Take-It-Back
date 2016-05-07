@@ -28,6 +28,8 @@
 		- Add mini map at bottom right
 		
 		- Make level picker screen scroll
+		
+		- Add the final health percentage to the stored end game data
 """
 
 
