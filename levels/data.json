@@ -1,9 +1,38 @@
 {
   "failed": [], 
-  "completed": {}, 
+  "completed": {
+    "levels/default/level1.map": {
+      "health": 20, 
+      "total-rings": 0, 
+      "rings": 0
+    }, 
+    "levels/tutorials/med-pack.map": {
+      "health": 20, 
+      "total-rings": 0, 
+      "rings": 0
+    }, 
+    "levels/default/level2.map": {
+      "health": 20, 
+      "total-rings": 0, 
+      "rings": 0
+    }, 
+    "levels/tutorials/ring-around-the-rosie.map": {
+      "rings": 2, 
+      "total-rings": 3, 
+      "health": 20
+    }, 
+    "levels/default/super-easy.map": {
+      "health": 20, 
+      "total-rings": 0, 
+      "rings": 0
+    }
+  }, 
   "packages": [
     "tutorials", 
     "default"
   ], 
-  "unlocked": []
+  "unlocked": [
+    "levels/default/level2.map", 
+    "levels/default/level3.map"
+  ]
 }

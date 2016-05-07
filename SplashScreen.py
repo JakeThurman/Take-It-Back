@@ -2,10 +2,15 @@ import pygame, colors
 from rendering import *
 from screen import Screen
 
-# Renderers the splash screen
 class SplashScreen(Screen):
-	# Constructor
-	def __init__(self, surface, screen_size):
+	"""
+		Renderers the splash screen
+	"""
+
+	def __init__(self, surface, screen_size, on_click_func):
+		"""Constructor
+		"""
+		
 		super().__init__()
 		
 		# Create dependencies
@@ -14,9 +19,16 @@ class SplashScreen(Screen):
 		
 		# Store settings
 		self.screen_size = screen_size
+		
+		# Store the click handler
+		self._on_click_func = on_click_func
+		
+	def handle_click(self):
+		self._on_click_func()
 	
-	# Renderers the splash screen 
 	def render(self, refresh_time):
+		"""Renderers the splash screen 
+		"""
 		# Set the backgroud to white
 		self.shape_renderer.render_rect((0, 0 , self.screen_size[0], self.screen_size[1]), color=colors.WHITE)
 		

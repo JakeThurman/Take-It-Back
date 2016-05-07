@@ -7,29 +7,17 @@
 	Project TODOs/Ideas:
 		- BUGS:
 			- Baddie movement calculation is just awful
+			- Make level picker screen scroll so you can have more than ~10 levels
 		
-		- Add locked/unlocked levels 
-			- Locked levels are crossed out
-			- Property on JSON object for level of key "unlocks" which is an array of .map file names
+		- Add quit button to SideScrollLevelPickerScreen
 		
-		- Add quit buttons 
-			- GameOverScreen
+		- Add "?" or "HELP" button whick explains controls 
 			- SideScrollLevelPickerScreen
 			- PauseMenuScreen
-		
-		- Make ESCAPE button from level screen go to pause screen instead of QUIT (PauseMenuScreen)
-			- Add "Resume" button 
-			- "Play again" changed to "Restart"
-		
-		- Add "?" or "HELP" buttom 
-			- SideScrollLevelPickerScreen
-			- PauseMenuScreen
+			
+		- Add pause button to level screen
 		
 		- Add mini map at bottom right
-		
-		- Make level picker screen scroll
-		
-		- Add the final health percentage to the stored end game data
 """
 
 
@@ -51,15 +39,16 @@ def main(FPS):
 	# This will handle switching from screen to screen for us
 	manager = ScreenManager(DISPLAYSURF, screen_size)
 	
-	# We want to start with the splash screen
-	manager.set(SplashScreen)
-	# Then, on click, we want to set the screen to the side scroller screen.
+	# On click of the splash screen, we want to set the screen to the side scroller screen.
 	# This is a weird looking line, I know, but bare with it.
 	# We first take the current screen (the SplashScreen we just set) using manager.get(),
 	# We then tell the screen that when we click it, (set_on_click) to call our lambda.
 	# that lambda gives the manager a new screen using manager.set. The lambda that we pass in there
 	# is a factory to create a new SideScrollLevelPickerScreen with those two parameters.
-	manager.set_on_click(lambda: manager.set(lambda surf, size: LevelPickerScreen(surf, size, manager.set)))
+	click_event = lambda: manager.set(lambda surf, size: LevelPickerScreen(surf, size, manager.set))
+	
+	# We want to start with the splash screen
+	manager.set(lambda surf, size: SplashScreen(surf, size, click_event))
 	
 	# FPS manager
 	clock = pygame.time.Clock()

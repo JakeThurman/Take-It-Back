@@ -6,6 +6,7 @@ import pygame, sys, colors, json, resources
 from rendering import *
 from screen import Screen
 from world import Level, Ring
+from levelstatescreens import PauseMenuScreen
 from pygame.locals import *
 
 class _settings:
@@ -48,7 +49,7 @@ class HealthBar:
 		
 		# Draw the current health bar overtop
 		self.shape_renderer.render_rect((full_bar_size[0], full_bar_size[1], full_bar_size[2] * (self.player.health/self.player.initial_health), full_bar_size[3]), color=self._get_curr_color())
-		
+
 class LevelRings:
 	"""Rendering class for the rings display for a level"""
 	def __init__(self, surface):
@@ -63,17 +64,18 @@ class LevelScreen(Screen):
 	
 	# Constructor
 	# NOTE: This c'tor is not a legal Screen.ScreenManger factory
-	def __init__(self, surface, screen_size, level_file, player_health, on_win_func, on_lose_func):	
+	def __init__(self, surface, screen_size, level_title, level_file, player_health, win_func, lose_func, set_screen_func, return_to_picker_func, restart_me_func):	
 		super().__init__()	
 		
 		# Store the passed in values (we don't surface as a global)
 		self.screen_size = screen_size
-		self._on_win_func = on_win_func
-		self._on_lose_func = on_lose_func
-		
-		# Create dependencies
-		self.shape_renderer = ShapeRenderer(surface)
-		
+		self.level_title = level_title
+		self._on_win_func = win_func
+		self._on_lose_func = lose_func
+		self._set_screen_func = set_screen_func
+		self._return_to_picker_func = return_to_picker_func
+		self._restart_me_func = restart_me_func
+				
 		# Create a level object
 		self.my_level = Level(level_file, player_health)
 		self.my_level.init()
@@ -82,7 +84,8 @@ class LevelScreen(Screen):
 		level_size = self.my_level.get_size()
 		self.camera = Camera(surface, self.my_level.player.rect, level_size[0], level_size[1], _settings.CAMERA_ADJUST_PIXELS)
 		
-		# Create a overlay renderers
+		# Create dependencies and overlay renderers
+		self.shape_renderer = ShapeRenderer(surface)
 		self.health_bar = HealthBar(surface, screen_size, self.my_level.player)
 		self.level_rings = LevelRings(surface)
 		
@@ -109,7 +112,13 @@ class LevelScreen(Screen):
 		
 		# if this is the escaple key, quit the game
 		if key == K_ESCAPE:
-			self._on_lose_func() # TODO: Add a pause menu triggered here.
+			self._pause_game()
+	
+	def _pause_game(self):
+		self._set_screen_func(lambda surface, screen_size: PauseMenuScreen(surface, screen_size, self.level_title, self._return_to_picker_func, self._restart_me_func, self._go_to_me))
+			
+	def _go_to_me(self):
+		self._set_screen_func(lambda surface, screen_size: self)
 	
 	# Handles key down events, and stores a flag for any of the keys we are listening for
 	def handle_key_down(self, key):
@@ -160,9 +169,10 @@ class LevelScreen(Screen):
 		# Render the status bar - if there is any reason to show it
 		if len(self.my_level.attackers) != 0:
 			self.health_bar.render()
-			
+		
+		# If there are any rings (named stars TODO rename) render the ring count at the top
 		if self.my_level.total_stars != 0:
 			self.level_rings.render(self.screen_size[0] - self.screen_size[0]/64, self.screen_size[1]/64, self.my_level.total_stars, self.my_level.stars)
-		
+				
 		# Update the pygame display
 		pygame.display.flip()

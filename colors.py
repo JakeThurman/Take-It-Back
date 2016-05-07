@@ -8,7 +8,7 @@ BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 SKY_BLUE = (0, 191, 255)
-LIGHT_GRAY = (211, 211, 211)
+LIGHT_GRAY = (150, 150, 150)
 MID_GRAY = (100, 100, 100)
 DARK_GRAY = (50, 50, 50)
 DARK_GREEN = (0,100,0)
@@ -18,6 +18,7 @@ TOMATO = (255,80,70)
 SILVER = (194, 194, 194)
 
 
+# Convers an image to the grayscale equivenlent
 def to_grayscale(image):
 	width, height = image.get_size() 
 	for x in range(width): 

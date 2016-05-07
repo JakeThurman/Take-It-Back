@@ -8,22 +8,18 @@ from pygame.locals import K_ESCAPE
 class Screen:
 	'''Handles common screen actions'''
 	def __init__(self):
-		# Set the click function to a dummy lambda by default
-		self.click_func = lambda: None
+		pass # Nothing to do
 	
 	def render(self, refresh_time):
 		raise NotImplementedError("render has no impl")
-	
-	def set_on_click(self, click_func):
-		# Store the onclick event
-		self.click_func = click_func
 		
 	def handle_click(self):
-		self.click_func()
+		pass
 		
 	def handle_key_down(self, key):
 		pass
 	
+	# By default close the game on key up
 	def handle_key_up(self, key):
 		if key == K_ESCAPE:
 			pygame.quit()

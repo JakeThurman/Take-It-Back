@@ -71,6 +71,7 @@ class CompletedIcon(Sprite):
 	def __init__(self, x, y):
 		super().__init__(x, y, "icons/check.png", use_alpha=True)
 		
+# Sprite icon for locked levels.
 class LockedIcon(Sprite):
 	def __init__(self, x, y):
 		super().__init__(x, y, "icons/locked.png", use_alpha=True)
@@ -145,11 +146,8 @@ class LevelPickerScreen(Screen):
 					
 					# Add a line for the level name
 					self.level_lines.append(LevelLine(level_data[_consts.LEVEL_NAME_KEY], file_path=file_path, player_health=player_health, locked=locked, unlocks=unlocks))
-		
-		# Call the click handler on click!
-		self.set_on_click(self._click_handler)
 	
-	def _click_handler(self):			
+	def handle_click(self):			
 		# Find the element that is at that position
 		clicked = [ll for ll in self.level_lines if not ll.is_header and ll.el.is_hovered and (not ll.locked or ll.file_path in self.json_data[_consts.UNLOCKED_LEVELS_KEY])]
 		
@@ -160,22 +158,22 @@ class LevelPickerScreen(Screen):
 		# Now, we only want to keep arround that single element
 		clicked = clicked[0]
 		
-		self._play_level(clicked.file_path, clicked.player_health, clicked.unlocks)
+		self._play_level(clicked)
 		
-	def _play_level(self, file_path, total_health, unlocks):
-		def win(total_rings, my_rings, my_health):
-			self._on_level_won(file_path, total_rings, my_rings, total_health, my_health, unlocks)
-		def lose():
-			self._on_level_lost(file_path, total_health)
-	
+	def _play_level(self, data):
+		# Create callback functions
+		win = lambda total_rings, my_rings, my_health: self._on_level_won(data, total_rings, my_rings, my_health)
+		lose = lambda: self._on_level_lost(data)
+		restart = lambda: self._play_level(data)
+		
 		# Now set the screen to the chosen level!
-		self._set_screen_func(lambda surface, screen_size: LevelScreen(surface, screen_size, file_path, total_health, win, lose))
-	
+		self._set_screen_func(lambda surface, screen_size: LevelScreen(surface, screen_size, data.name, data.file_path, data.player_health, win, lose, self._set_screen_func, self._go_to_me, restart))
+		
 	def _go_to_me(self):
 		# Set the screen to this object
 		self._set_screen_func(lambda surface, screen_size: self)
 		
-	def _on_level_won(self, file_path, total_rings, my_rings, total_health, my_health, unlocks):
+	def _on_level_won(self, data, total_rings, my_rings, my_health):
 		data_changed = False
 		
 		# Shortcut names
@@ -183,20 +181,20 @@ class LevelPickerScreen(Screen):
 		completed = self.json_data[_consts.COMPLETED_LEVELS_KEY]
 		
 		# Add the file to the completed levels array		
-		if file_path not in completed or completed[file_path][_consts.COMPLETED_LEVEL_MY_RINGS_KEY] < my_rings or completed[file_path][_consts.COMPLETED_LEVEL_MY_HEALTH_KEY] < my_health:
-			completed[file_path] = {}
-			completed[file_path][_consts.COMPLETED_LEVEL_MY_RINGS_KEY] = my_rings
-			completed[file_path][_consts.COMPLETED_LEVEL_TOTAL_RINGS_KEY] = total_rings
-			completed[file_path][_consts.COMPLETED_LEVEL_MY_HEALTH_KEY] = my_health
+		if data.file_path not in completed or completed[data.file_path][_consts.COMPLETED_LEVEL_MY_RINGS_KEY] < my_rings or completed[data.file_path][_consts.COMPLETED_LEVEL_MY_HEALTH_KEY] < my_health:
+			completed[data.file_path] = {}
+			completed[data.file_path][_consts.COMPLETED_LEVEL_MY_RINGS_KEY] = my_rings
+			completed[data.file_path][_consts.COMPLETED_LEVEL_TOTAL_RINGS_KEY] = total_rings
+			completed[data.file_path][_consts.COMPLETED_LEVEL_MY_HEALTH_KEY] = my_health
 			data_changed = True
 			
 		# Remove it from the failed array
-		if file_path in failed:
-			failed.remove(file_path)
+		if data.file_path in failed:
+			failed.remove(data.file_path)
 			data_changed = True
 			
 		# Record all of the levels this unlocks as unlocked
-		for map_path in unlocks:
+		for map_path in data.unlocks:
 			if map_path not in self.json_data[_consts.UNLOCKED_LEVELS_KEY]:
 				self.json_data[_consts.UNLOCKED_LEVELS_KEY].append(map_path)
 				data_changed = True
@@ -206,37 +204,37 @@ class LevelPickerScreen(Screen):
 			self._dump_data_file()
 	
 		# Show the end game screeen
-		self._set_end_game_screen(True, file_path, total_health)
-	
-	def _on_level_lost(self, file_path, total_health):		
+		completion_percentage = self._calculate_completion_percentage(my_rings, total_rings, my_health, data.player_health)
+		self._set_screen_func(lambda surface, screen_size: EndGameScreen(surface, screen_size, True, self._go_to_me, lambda: self._play_level(data), completion_percentage=completion_percentage))
+		
+	def _on_level_lost(self, data):		
 		# Shortcut names
 		failed = self.json_data[_consts.FAILED_LEVELS_KEY]
 		completed = self.json_data[_consts.COMPLETED_LEVELS_KEY]
 	
 		# Update the data that needs to be
-		if not file_path in completed and not file_path in failed:
-			failed.append(file_path)
+		if not data.file_path in completed and not data.file_path in failed:
+			failed.append(data.file_path)
 			self._dump_data_file()
 	
 		# Show the end game screen
-		self._set_end_game_screen(False, file_path, total_health)
+		self._set_screen_func(lambda surface, screen_size: EndGameScreen(surface, screen_size, False, self._go_to_me, lambda: self._play_level(data)))
 		
 	def _dump_data_file(self):
 		# Update the data file with new data
 		with open(_consts.JSON_DATA_FILE_NAME, 'w') as outfile:
 			json.dump(self.json_data, outfile, indent=2)
 	
-	def _set_end_game_screen(self, is_win, file_path, total_health):
-		# Set the screen to an EndGameScreen. We give this a callback to return to the picker screen, and a callback to replay to same level.
-		self._set_screen_func(lambda surface, screen_size: EndGameScreen(surface, screen_size, is_win, self._go_to_me, lambda: self._play_level(file_path, total_health)))
-		
-	def _calculate_completion_percentate(self, file_path, total_health):
+	def _calculate_completion_percentage_from_data_file(self, map_file_path, level_health):
 		# Get the score data for this level
-		level_data = self.json_data[_consts.COMPLETED_LEVELS_KEY][file_path]
+		level_data = self.json_data[_consts.COMPLETED_LEVELS_KEY][map_file_path]
 		my_rings = level_data[_consts.COMPLETED_LEVEL_MY_RINGS_KEY]
 		total_rings = level_data[_consts.COMPLETED_LEVEL_TOTAL_RINGS_KEY]
 		my_health = level_data[_consts.COMPLETED_LEVEL_MY_HEALTH_KEY]
 		
+		return self._calculate_completion_percentage(my_rings, total_rings, my_health, level_health)
+	
+	def _calculate_completion_percentage(self, my_rings, total_rings, my_health, total_health):		
 		# Calculate the percentage for the ring completion
 		ring_percentage = int((my_rings/total_rings)*100) if total_rings != 0 else 100
 		# And the percentage for the health at the end
@@ -274,7 +272,7 @@ class LevelPickerScreen(Screen):
 			
 			elif line.file_path in self.json_data[_consts.COMPLETED_LEVELS_KEY]:			
 				# Create a row for the level including the completion percentage.
-				line_text = line.name + " (" + str(self._calculate_completion_percentate(line.file_path, line.player_health)) + "%)"
+				line_text = line.name + " (" + str(self._calculate_completion_percentage_from_data_file(line.file_path, line.player_health)) + "%)"
 				
 				# Now, render that line
 				el = self.level_text_renderer.render(line_text, el_pos, color=colors.MID_GREEN, hover_color=colors.PALE_GREEN)
