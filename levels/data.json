@@ -1,12 +1,9 @@
 {
-  "failed": [
-  ], 
-  "completed": {
-  }, 
+  "failed": [], 
+  "completed": {}, 
   "packages": [
     "tutorials", 
     "default"
   ], 
-  "unlocked": [
-  ]
+  "unlocked": []
 }

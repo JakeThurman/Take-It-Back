@@ -1,5 +1,5 @@
              XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX       
-             W       X        X                                                X                              X                                                  R                    X         
+             W       X                                                         X                              X                                                  R                    X         
              W       X                                                         X                              X                                                  R               P    X         
              W       X                                                        4X                              X                                                  R                    X         
              W       X                                                   XXXXXXX                              X                                                  R                    X           
@@ -36,11 +36,13 @@
              X                                          R   R        XXXXXXXXX                  X     XXXXXXXX                            R                     X                     X         
              X                                          R * R        XXXXXXXXX                  X    2XXXXXXXX                            R         626        *X                    8X               
              XXXXXXXXXXXDDXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXUUUXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                
-		               X                                    X                  
-		               X                                    X                  
-		               X                                    X 
-                       X                          2         X					   
-		               XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                       X                                    X                  
+                       X                                    X                  
+                       X                                    X 
+                       X                                    X					   
+                       XXXXXXXXXXXXXXXXXXXXXXXXXXX          X
+                                                 X2         X
+                                                 XXXXXXXXXXXX
 		
 		
 		
