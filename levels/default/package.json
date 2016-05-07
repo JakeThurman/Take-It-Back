@@ -1,9 +1,29 @@
 {
-	"name": "Default Levels",
-	"levels": [
-		{ "name": "Level 1", "map": "level1.map" },
-		{ "name": "Level 2", "map": "level2.map" },
-		{ "name": "Level 3", "map": "level3.map" },
-		{ "name": "Super Easy", "map": "super-easy.map" }
-	]
+  "name":"Default Levels",
+  "levels":[
+    {
+      "name":"Super Easy",
+      "map":"super-easy.map"
+    },
+    {
+      "name":"Level 1",
+      "map":"level1.map",
+      "unlocks":[
+        "level2.map"
+      ]
+    },
+    {
+      "name":"Level 2",
+      "map":"level2.map",
+      "locked":true,
+      "unlocks":[
+        "level3.map"
+      ]
+    },
+    {
+      "name":"Level 3",
+      "map":"level3.map",
+      "locked":true
+    }
+  ]
 }

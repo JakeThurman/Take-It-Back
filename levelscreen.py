@@ -128,7 +128,7 @@ class LevelScreen(Screen):
 		# Check if the player has one. If they have, 
 		# call on_win_func() and return; we're done.
 		if self.my_level.player.has_won(self.my_level.win_blocks):		
-			self._on_win_func(self.my_level.total_stars, self.my_level.stars)
+			self._on_win_func(self.my_level.total_stars, self.my_level.stars, self.my_level.player.health)
 			return
 		
 		# Set the backgroud to sky blue
