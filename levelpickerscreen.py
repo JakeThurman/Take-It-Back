@@ -93,14 +93,17 @@ class LevelLine:
 class LevelPickerScreen(Screen):
 	"""Handles picking a side scroller game"""
 
-	# Constructor
-	# NOTE: This c'tor is not a legal Screen.ScreenManger factory
+	# Constants 
+	LINK_TEXT_SIZE = 25
+	
 	def __init__(self, surface, screen_size, set_screen_func):		
+		"""Constructor"""
 		super().__init__()
 	
 		# Create rendering dependencies
 		self.package_text_renderer = OptionRenderer(surface, pygame.font.Font(None, 40), do_hover=False)
 		self.level_text_renderer = OptionRenderer(surface, pygame.font.SysFont("monospace", 25))
+		self.link_text_renderer = OptionRenderer(surface, pygame.font.SysFont("monospace", self.LINK_TEXT_SIZE))
 		self.shape_renderer = ShapeRenderer(surface)
 		self.sprite_renderer = SpriteRenderer(surface)
 		
@@ -148,6 +151,12 @@ class LevelPickerScreen(Screen):
 					self.level_lines.append(LevelLine(level_data[_consts.LEVEL_NAME_KEY], file_path=file_path, player_health=player_health, locked=locked, unlocks=unlocks))
 	
 	def handle_click(self):			
+		# Check special links first
+		if self.quit_button.is_hovered:
+			pygame.quit()
+			sys.exit()
+			return # We've done what we needed to
+	
 		# Find the element that is at that position
 		clicked = [ll for ll in self.level_lines if not ll.is_header and ll.el.is_hovered and (not ll.locked or ll.file_path in self.json_data[_consts.UNLOCKED_LEVELS_KEY])]
 		
@@ -165,9 +174,24 @@ class LevelPickerScreen(Screen):
 		win = lambda total_rings, my_rings, my_health: self._on_level_won(data, total_rings, my_rings, my_health)
 		lose = lambda: self._on_level_lost(data)
 		restart = lambda: self._play_level(data)
+		quit = lambda: self._quit_level(data)
 		
 		# Now set the screen to the chosen level!
-		self._set_screen_func(lambda surface, screen_size: LevelScreen(surface, screen_size, data.name, data.file_path, data.player_health, win, lose, self._set_screen_func, self._go_to_me, restart))
+		self._set_screen_func(lambda surface, screen_size: LevelScreen(surface, screen_size, data.name, data.file_path, data.player_health, win, lose, self._set_screen_func, quit, restart))
+		
+	def _quit_level(self, data):
+		self._add_to_failed(data)
+		self._go_to_me() # Return to the picker screen
+		
+	def _add_to_failed(self, data):
+		# Shortcut names
+		failed = self.json_data[_consts.FAILED_LEVELS_KEY]
+		completed = self.json_data[_consts.COMPLETED_LEVELS_KEY]
+	
+		# Update the data that needs to be
+		if not data.file_path in completed and not data.file_path in failed:
+			failed.append(data.file_path)
+			self._dump_data_file()
 		
 	def _go_to_me(self):
 		# Set the screen to this object
@@ -208,15 +232,7 @@ class LevelPickerScreen(Screen):
 		self._set_screen_func(lambda surface, screen_size: EndGameScreen(surface, screen_size, True, self._go_to_me, lambda: self._play_level(data), completion_percentage=completion_percentage))
 		
 	def _on_level_lost(self, data):		
-		# Shortcut names
-		failed = self.json_data[_consts.FAILED_LEVELS_KEY]
-		completed = self.json_data[_consts.COMPLETED_LEVELS_KEY]
-	
-		# Update the data that needs to be
-		if not data.file_path in completed and not data.file_path in failed:
-			failed.append(data.file_path)
-			self._dump_data_file()
-	
+		self._add_to_failed(data)
 		# Show the end game screen
 		self._set_screen_func(lambda surface, screen_size: EndGameScreen(surface, screen_size, False, self._go_to_me, lambda: self._play_level(data)))
 		
@@ -291,3 +307,7 @@ class LevelPickerScreen(Screen):
 			
 			# Finally, store the rendered elemenet for click handling
 			line.set_el(el)
+			
+	
+		quit_pos = (self.screen_size[0] - self.LINK_TEXT_SIZE * 4, self.screen_size[1] - self.LINK_TEXT_SIZE * 2)
+		self.quit_button = self.link_text_renderer.render(resources.QUIT_GAME, quit_pos, color=colors.LIGHT_GRAY, hover_color=colors.SILVER)

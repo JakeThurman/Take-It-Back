@@ -128,9 +128,9 @@ class LevelScreen(Screen):
 		self.my_level.all_sprite.add(bullet)
 		self.entities.append(bullet)
 		
-	def _on_entity_die(self, bullet):
-		self.my_level.all_sprite.remove(bullet)
-		self.entities.remove(bullet)
+	def _on_entity_die(self, ent):
+		self.my_level.all_sprite.remove(ent)
+		self.entities.remove(ent)
 	
 	# Renders a side scoller display
 	def render(self, refresh_time):
@@ -154,7 +154,7 @@ class LevelScreen(Screen):
 			
 		# Update any current enitities
 		for entity in self.entities:
-			entity.update(refresh_time, self.camera, self.my_level.obstacles, self.my_level.player, lambda: self._on_entity_die(entity), lambda: self._on_lose_func())
+			entity.update(refresh_time, self.entities, self.camera, self.my_level.obstacles, self.my_level.player, lambda: self._on_entity_die(entity), lambda: self._on_lose_func())
 		
 		# Update other items
 		self.my_level.update_health_packs()

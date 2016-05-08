@@ -58,7 +58,7 @@ class EndGameScreen(Screen):
 		
 		# For a win screen add the completion percentage line
 		if self.is_win:
-			self.option_renderer.render(resources.COMPLETION_PERCENTAGE.replace("{0}", str(self.completion_percentage)), (pos[0], pos[1]*2), color=colors.LIGHT_GRAY, hover_color=colors.LIGHT_GRAY)
+			self.option_renderer.render(resources.COMPLETION_PERCENTAGE.format(str(self.completion_percentage)), (pos[0], pos[1]*2), color=colors.LIGHT_GRAY, hover_color=colors.LIGHT_GRAY)
 		
 		# Render the links at the bottom (pick a level and play again)
 		self.return_to_level = self.option_renderer.render(resources.CHOOSE_A_LEVEL, (pos[0], self.screen_size[1]-(3*pos[1])), color=colors.SILVER)
@@ -112,7 +112,7 @@ class PauseMenuScreen(Screen):
 		pos = (self.screen_size[0]/8, self.screen_size[1]/8)
 		
 		# Render the "you won/lost" message
-		self.option_renderer.render(resources.PAUSED_MESSAGE.replace("{0}", self.level_name), pos, color=colors.WHITE, hover_color=colors.WHITE)
+		self.option_renderer.render(resources.PAUSED_MESSAGE.format(self.level_name), pos, color=colors.WHITE, hover_color=colors.WHITE)
 		
 		# Render the links at the bottom (pick a level and play again)
 		self.continue_bttn   = self.option_renderer.render(resources.CONTINUE_GAME, (pos[0], self.screen_size[1]-(4*pos[1])), color=colors.SILVER)

@@ -10,18 +10,18 @@
              X       X        X                                                                               X                                    X             L                    X       
              X       X        X                                                                               X                                    X             L                    X         
              X       X        X                                                                               X                                    X             L                    X         
-             X       X        X                XXXXXXXX                                     XXXXXXX           X           XXXXXX                   X             L                    X         
+             X       X        X                XXXXXXXX                    XX               XXXXXXX           X           XXXXXX                   X             L                    X         
              X       X        X                                                                               X           XXXXXX                   X             L                    X         
              X       X        X                                                                               X           XXXXXX                   X             L                    X         
              X       X        X                                                                               X      6    XXXXXX                   X             L                    X         
-             XUUUUUUUXDDDDDDDDX       XXXXXX                            XXXXXXXXXXXXXXX                       XDDDDDDXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX        
+             XUUUUUUUXDDDDDDDDX       XXXXXX                          XXXXXXXXXXXXXXXXX                       XDDDDDDXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX        
              X       X        X                                                X                              X      X                                         X                      X         
              X       X        X                                                X                             +X      X                                         X                      X         
              X       X        X                                                X                              X      X                                         X                      X         
              X       X        X                                 XXXXXX         X      XXXXXXXXXXX             X      X                                         X                      X         
              XUUUUUUUX        XXXXXXXX                          XXXXX          X                              X      X6            XUUUUUUXXXXXXXXXXXXXX       X                      X         
              X       X        X                                                X                              X      XXXXXX        X      L            X       X         XXXXX        X         
-             X       X        X                                                X                  XXXXXXXXXXXXX                    X      L            X                 X            X         
+             X       X        X                                                X                    XXXXXXXXXXX                    X      L            X                 X            X         
              X       X        X                                         XDDDDDDX                              X                    X      L            X                 X           5X         
              X       X        X           XXXXXXXXXX                    X      X                              X                    X      L            X                 X        XXXXX         
              X       X        X           XXXXXXXXXX                    X  *   X                              X                    X      L            X                 X            X         
@@ -35,12 +35,12 @@
              X                                          R   R        XXXXXXXXX                       XXXXXXXXX                            R                     X                   XXX         
              X                                          R   R        XXXXXXXXX                  X     XXXXXXXX                            R                     X                     X         
              X                                          R * R        XXXXXXXXX                  X    2XXXXXXXX                            R         626        *X                    8X               
-             XXXXXXXXXXXDDXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXUUUXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                
-                       X                                    X                  
-                       X                                    X                  
-                       X                                    X 
-                       X                                    X					   
-                       XXXXXXXXXXXXXXXXXXXXXXXXXXX          X
+             XXXXXXXXXXX  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXUUUXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                
+                       X  R                                 X                  
+                       X  R                                 X                  
+                       X  R                                 X 
+                       XXXXXXXX                             X					   
+                              XXXXXXXXXXXXXXXXXXXX          X
                                                  X2         X
                                                  XXXXXXXXXXXX
 		

@@ -167,7 +167,7 @@ class Bullet(Sprite):
 	"""
 	# Constants
 	HORIZ_MOV_INCR = 10
-	MAX_LIFETIME_MS = 1000
+	MAX_LIFETIME_MS = 1500 #1.5s
 	
 	# C'tor
 	def __init__(self, x, y, right, maker, power):
@@ -179,9 +179,13 @@ class Bullet(Sprite):
 		self.maker = maker
 		self.power = power
 		self.lifetime = 0
+		
+	def kill(self):
+		# Say that this bullet is old as dirt to kill it on the next frame.
+		self.lifetime += self.MAX_LIFETIME_MS
 	
 	# Upodates the bullet, 
-	def update(self, refresh_time, camera, obstacles, player, on_die, on_game_over):
+	def update(self, refresh_time, bad_entities, camera, obstacles, player, on_die, on_game_over):
 		self.lifetime += refresh_time
 		
 		# If this bullet has lasted for more than {MAX_LIFETIME_MS}, kill it now
@@ -213,7 +217,39 @@ class Bullet(Sprite):
 				on_die()
 				return
 				
-class Baddie(Sprite):
+class LivingThing(Sprite):
+	def __init__(self, x, y, image, **kwargs):
+		super().__init__(x, y, image, **kwargs)
+		
+		# Initialize movement locals
+		self.movy = 0
+		self.movx = 0
+		self.contact = False
+		self.jump = False
+		self.maker = None
+	
+	def _collide(self, movx, movy, obstacles):
+		self.contact = False
+		
+		# Check if the player is colliding with any of the map
+		for o in obstacles:
+			if o != self.maker and self.rect.colliderect(o):
+				# Handle X overflow
+				if movx > 0 and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.LEFT_ONLY):
+					self.rect.right = o.rect.left
+				if movx < 0 and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.RIGHT_ONLY):
+					self.rect.left = o.rect.right
+					
+				# Handle Y overflow
+				if movy > 0 and o.dir in (WallOpenDir.NONE, WallOpenDir.UP_ONLY):
+					self.rect.bottom = o.rect.top
+					self.movy = 0
+					self.contact = True
+				if movy < 0 and o.dir in (WallOpenDir.NONE, WallOpenDir.DOWN_ONLY):
+					self.rect.top = o.rect.bottom
+					self.movy = 0
+				
+class Baddie(LivingThing):
 	"""
 		This class represents a pathfinding enemie
 		as spawned by a "spawner" block (6-10)		
@@ -221,11 +257,12 @@ class Baddie(Sprite):
 	# Constants
 	HORIZ_MOV_INCR = 2
 	VERT_MOV_INCR = 8
-	MAX_LIFETIME_MS = 20 * 1000
+	MAX_LIFETIME_MS = 20 * 1000 #20s
+	DEATH_TIME = 500 # 0.5s
 	ATTACK_POWER_RATIO = 0.1
-		
-	# C'tor
+	
 	def __init__(self, x, y, maker, power, before_death_func):		
+		"""Constructor"""
 		# Call the parent c'tor
 		super().__init__(x, y, "actions/baddie_idle.png", use_alpha=True)
 		
@@ -233,19 +270,31 @@ class Baddie(Sprite):
 		self.maker = maker
 		self.power = power
 		self.lifetime = 0
-		self.contact = False
+		self.dead_for = 0
+		self._is_dying = False
 		
 		# Store callback
-		self.before_death_func = before_death_func
+		self._before_death_func = before_death_func
 		
-	def update(self, refresh_time, camera, obstacles, player, on_die, on_game_over):
+	def _on_death(self, on_die):		
+		self._before_death_func(self)
+		on_die()
+		
+	def _set_dying(self):
+		self._is_dying = True
+		self.image = pygame.image.load("actions/baddie_dying.png").convert_alpha()
+		
+	def update(self, refresh_time, bad_entities, camera, obstacles, player, on_die, on_game_over):	
+		"""Updates the baddie object based on the current given state"""
 		# Increment the the lifetime counter
 		self.lifetime += refresh_time
+		if self._is_dying:
+			self.dead_for += refresh_time
 		
-		# If this baddie has lasted for more than {MAX_LIFETIME_MS}, kill it now
-		if self.lifetime > self.MAX_LIFETIME_MS:
-			self.before_death_func(self)
-			on_die()
+		# Handle the end of the dealth cycle
+		# or if this baddie has lasted for more than {MAX_LIFETIME_MS}, despawn now
+		if self.dead_for > self.DEATH_TIME or self.lifetime > self.MAX_LIFETIME_MS:
+			self._on_death(on_die)
 			return
 	
 		# Handle the case that the baddie hits the player first
@@ -255,33 +304,51 @@ class Baddie(Sprite):
 				on_game_over()
 			return
 		
-		# Do not move if the player is not arround
-		if not camera.can_see(self):
+		# If dying, don't move
+		# also don't move if the player is not arround
+		if self._is_dying or  not camera.can_see(self):
 			return
-		
-		# Calculate the direction to move
+			
+		# Check if we ran into anything else. If so kill the first one created (the first one to see the others - me!)
+		for e in bad_entities:
+			if e != self and self.rect.colliderect(e):		
+				if isinstance(e, Bullet):
+					e.kill()
+				self._set_dying()
+				return
+			
+		# Calculate the direction of the player
 		right = player.rect.center[0] > self.rect.center[0]
 		left = player.rect.center[0] < self.rect.center[0]
+		if left:
+			self.direction_is_right = False
+			self.movx = -self.HORIZ_MOV_INCR
 		
-		# Now, move the player by the {HORIZ_MOV_INCR} is the appropriate direction
 		if right:
-			movx = self.HORIZ_MOV_INCR 
-		elif left:
-			movx = -self.HORIZ_MOV_INCR
-		else: 
-			movx = 0
+			self.direction_is_right = True
+			self.movx = self.HORIZ_MOV_INCR
 		
-		self.rect.right += movx
+		if not (left or right):
+			self.movx = 0
+		self.rect.right += self.movx
 		
-		# Check if the baddie is colliding with any of the map
-		# also check if we are standing on anything, otherwise we're falling.
-		if left or right:
-			for o in obstacles:
-				# Check if we've running into this block. If so move back. (we can go through our maker)
-				if o != self.maker and self.rect.colliderect(o):
-					self.rect.right -= movx
+		self._collide(self.movx, 0, obstacles)
+		
+		if not self.contact:
+			self.movy += 0.3
+			if self.movy > 10:
+				self.movy = 10
+			self.rect.top += self.movy
+		
+		if self.jump:
+			self.movy += 2
+			self.rect.top += self.movy
+			if self.contact:
+				self.jump = False
+		
+		self._collide(0, self.movy, obstacles)
 
-class Player(pygame.sprite.Sprite):
+class Player(LivingThing):
 	'''
 		class for player and collision
 		.map file: P
@@ -291,19 +358,6 @@ class Player(pygame.sprite.Sprite):
 	
 	# C'tor
 	def __init__(self, x, y, initial_health):
-		# Call the parent c'tor
-		super().__init__()
-
-		# Initialize the positional values
-		self.movy = 0
-		self.movx = 0
-		self.x = x
-		self.y = y
-
-		# Initialize other locals
-		self.contact = False
-		self.jump = False
-
 		# Store the names of all of the images
 		self._images =  { 
 			"run_left": "actions/run_left.png",
@@ -315,9 +369,9 @@ class Player(pygame.sprite.Sprite):
 			"down_left": "actions/down_left.png",
 			"down_right": "actions/down_right.png"
 		}
-
-		# Get the initial image
-		self.image = pygame.image.load(self._images["idle_right"]).convert_alpha()
+		
+		# Call the parent c'tor
+		super().__init__(x, y, self._images["idle_right"], use_alpha=True)
 
 		# Store information this sprite's size.
 		self.rect = self.image.get_rect()
@@ -357,7 +411,7 @@ class Player(pygame.sprite.Sprite):
 				self.image = pygame.image.load(self._images["down_left"]).convert_alpha()
 		
 		if not down and self.direction_is_right:
-				self.image = pygame.image.load(self._images["idle_right"]).convert_alpha()
+			self.image = pygame.image.load(self._images["idle_right"]).convert_alpha()
 		
 		if not down and not self.direction_is_right:
 			self.image = pygame.image.load(self._images["idle_left"]).convert_alpha()
@@ -397,27 +451,6 @@ class Player(pygame.sprite.Sprite):
 				self.jump = False
 		
 		self._collide(0, self.movy, obstacles)
-
-	def _collide(self, movx, movy, obstacles):
-		self.contact = False
-		
-		# Check if the player is colliding with any of the map
-		for o in obstacles:
-			if self.rect.colliderect(o):
-				# Handle X overflow
-				if movx > 0 and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.LEFT_ONLY):
-					self.rect.right = o.rect.left
-				if movx < 0 and (o.dir == WallOpenDir.NONE or o.dir == WallOpenDir.RIGHT_ONLY):
-					self.rect.left = o.rect.right
-					
-				# Handle Y overflow
-				if movy > 0 and o.dir in (WallOpenDir.NONE, WallOpenDir.UP_ONLY):
-					self.rect.bottom = o.rect.top
-					self.movy = 0
-					self.contact = True
-				if movy < 0 and o.dir in (WallOpenDir.NONE, WallOpenDir.DOWN_ONLY):
-					self.rect.top = o.rect.bottom
-					self.movy = 0
 					
 	def has_won(self, win_blocks):
 		for wb in win_blocks:
