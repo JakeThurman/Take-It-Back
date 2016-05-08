@@ -33,17 +33,29 @@ class SplashScreen(Screen):
 		self.shape_renderer.render_rect((0, 0 , self.screen_size[0], self.screen_size[1]), color=colors.WHITE)
 		
 		# Set up the text
-		self.text_renderer.render('Game Title: Take It Back', 1)
-		self.text_renderer.render('Name: Jake Thurman', 2)
-		self.text_renderer.render('CIS226-HYB1', 3)
-		self.text_renderer.render('Summary: This game will be a side scroller with', 5)
-		self.text_renderer.render('the goal of taking some object to the end of each', 6)
-		self.text_renderer.render('level. There will be badies for the user to avoid,', 7)
-		self.text_renderer.render('and other various obstacles. It will be a simple,', 8)
-		self.text_renderer.render('fun game to waste time and give players a sense', 9)
-		self.text_renderer.render('of accomplishment.', 10)
-		self.text_renderer.render('CLICK ANYWHERE TO PLAY!', 12)
+		items = """Game Title: Take It Back,
+Name: Jake Thurman,
+CIS226-HYB1,
+Summary: This game is a side scroller with the goal of
+   reaching the end of each level while getting as many
+   rings as possible, all without dying. There are be badies
+   and weapons for the user to avoid, and other various
+   obstacles. It will be a simple, fun game to waste time
+   and give players a sense of accomplishment. 
+   
+You can select a level from the list that will appear on
+   the next screen. Completed levels will turn Green, Failed
+   levels will turn red and locked levels will be a darker gray.
+ 
+To play the game, use the left and right arrow keys to move,
+   and the up arrow or the space bar to jump.
+   
+CLICK ANYWHERE TO PLAY!""".split("\n")
 		
+		# Render the main text
+		for i, item in enumerate(items):
+			self.text_renderer.render(item, i + 1)
+				
 		screen_x, screen_y = self.screen_size
 		
 		# Draw a border arround the screen for decoration!

@@ -14,8 +14,6 @@
 		- Add "?" or "HELP" button whick explains controls 
 			- SideScrollLevelPickerScreen
 			- PauseMenuScreen
-			
-		- Add pause button to level screen
 		
 		- Add mini map at bottom right
 """
