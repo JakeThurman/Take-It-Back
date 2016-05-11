@@ -1,9 +1,9 @@
        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
        X                        X                                X          X                                                      X
        X                        X                                X                                                                 X
-       X                        X                                X                                                                 X
+       X                        X                *               X                                                                 X
        X      X                 X           XXXXXXXXXX           X                     XXXXXXXX                                    X
-       X                        X                                X                     X                                           X
+       X                  *     X                                X                     X                                           X
        X                  X     X                                X       XXXX          X                                           X
        X                        X                                X          XXXX       X        XXXXXX       XXXXXXXXXXXXXX        X
        X                                                         X          X          X                                  X        X
@@ -16,7 +16,7 @@
        XXXXXXXXX                X                                X          XXXX       X                                  X        X
        XX               XXXXXXXXXXXXXX                           X          X          X                                  X        X
        XX               XXXXXXXXXXXXXX                           X          X          X                                  X        X
-       XX               XXXXXXXXXXXXXX                           X          X          X                                  X        X
+       XX               XXXXXXXXXXXXXX                           X          X          X                             *    X        X
        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX           XXXXXXXXXX          X      XXXXX                            XXXXXXX        X
        X                                    X                                          X                            XXXXXXX        X
        X                                    X                                          X                            XXXXXXX        X
@@ -27,21 +27,21 @@
        X                X                                                   X      XXXXX        L                         X        X
        X                XXXXXXX                              X              X                   L                         X        X
        X                XXXXXXX                              X              X                   L                         X        X 
-       X                XXXXXXX                              X              X                   L                         X        X
+       X                XXXXXXX                              X              X                   L        *                X        X
        X                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX     X        X
        X                                                                                                                  X        X
        X                                                                                                                  X        X
        X                                                                                                                XXX        X
-       XXXXXX                                                                                                         XXXXX        X
+       X                                                                                                              XXXXX        X
        X                        X                                X              X        XXXXXXX                    XXXXXXX        X
        X                        X                                X         XXXXXX        XXXXXXX                  XXXXXXXXX        X
-       X             XXXXXXX    X                                X              X        XXXXXXX                XXXXXXXXXXX        X
+       X             XXXXXXXX   X                                X              X        XXXXXXX                XXXXXXXXXXX        X
        X                        X                      X         X              X        XXXXXXX              XXXXXXXXXXXXX        X
-       X                        X                      X         X              X        XXXXXX             XXXXXXXXXXXXXXX        X
+       X                        X                      X         X*             X        XXXXXX             XXXXXXXXXXXXXXX        X
        XXXXXXX                  X                      X         XXXXXXXXXX     X                         XXXXXXXXXXXXXXXXX        X
        X                        X                      X                        X                       XXXXXXXXXXXXXXXXXXX        X
        X                        X                      X                        X                     XXXXXXXXXXXXXXXXXXXXX        X
-       X                        X                      X                        X                   XXXXXXXXXXXXXXXXXXXXXXXWWWWWWWWX
+       X*                       X                      X                        X                   XXXXXXXXXXXXXXXXXXXXXXXWWWWWWWWX
        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
