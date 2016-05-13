@@ -1,25 +1,3 @@
-# Jake Thurman
-# CIS 226 Game Scripting
-# Assignment 3
-# 4/24/16
-
-"""
-	Project TODOs/Ideas:
-		- BUGS:
-			- Baddies sometimes fall out of screen
-			- Make level picker screen scroll so you >~10 levels
-		
-		- Add "?" or "HELP" button whick explains controls 
-			- SideScrollLevelPickerScreen
-			- PauseMenuScreen
-			
-		- Jumping on baddie's heads shoud kill them
-		
-		- Add mini map at bottom right
-		- Full Screen Mode
-"""
-
-
 import pygame, sys, resources
 from pygame.locals import *
 from splashscreen import SplashScreen

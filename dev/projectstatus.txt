@@ -1,0 +1,27 @@
+Project TODOs/Ideas:
+	- BUGS:
+		- Baddies sometimes fall out of screen
+		- Make level picker screen scroll so you >~10 levels
+	
+	- Add "?" or "HELP" button whick explains controls 
+		- SideScrollLevelPickerScreen
+		- PauseMenuScreen
+		
+	- Jumping on baddie's heads shoud kill them
+	
+	- Add mini map at bottom right
+	- Overlain in-depth turorial.
+	
+	- Support Full Screen Mode
+	
+	- Add In game level editor
+	- Add package import/export
+	
+	
+
+Steam TODOs:
+	- Hide the console.
+	- Replace Splash Screen with new "Launcher" screen
+	- Add useful exception logging.
+	- Create more levels.
+	- Add Sound Effects & BG music.
