@@ -3,27 +3,27 @@ Project TODOs/Ideas:
 		- Baddies sometimes fall out of screen
 		- Make level picker screen scroll so you >~10 levels
 	
-	- Add "?" or "HELP" button whick explains controls 
-		- SideScrollLevelPickerScreen
-		- PauseMenuScreen
-		
-	- Jumping on baddie's heads shoud kill them
+	- UX:
+		- "?" or "HELP" button which explains controls 
+			- SideScrollLevelPickerScreen
+			- PauseMenuScreen
+		- Back Button
+		- Add a link to settings from pause menu
 	
-	- Add mini map at bottom right
-	- Overlain in-depth turorial.
+	- Mechanics:
+		- Should jumping on baddie's heads kill them?
 	
-	- Support Full Screen Mode
-	
-	- Add In game level editor
-	- Add package import/export
-	
-	- Replace Splash Screen with new "Launcher" screen
-	
-	- Add Sound Effects & BG music.
-	
-	
+	- Features:
+		- Mini-map
+		- Overlain in-depth (real) turorial level.
+		- In-game level editor
+		- Package import/export
 
-Steam TODOs:
-	- Create more levels.
-	- Add useful exception logging.
-	- Create an installer
+	- Other:
+		- Support Full Screen Mode
+		- Add Sound Effects & BG music.
+	
+	- Requirements:
+		- Design Settings Screen
+		- Create more levels.
+		- Create an installer

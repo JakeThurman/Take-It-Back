@@ -10,7 +10,6 @@ import pygame, sys, resources, datetime, logging
 from tkinter import messagebox
 from pygame.locals import *
 from launchscreen import LaunchScreen
-from levelpickerscreen import LevelPickerScreen
 from screen import ScreenManager
 
 def main():
@@ -25,15 +24,15 @@ def main():
 	# This will handle switching from screen to screen for us
 	manager = ScreenManager(DISPLAYSURF, screen_size)
 	
-	# Create a lambda event to use as a "start game" callback for the launch screen.
-	start_game = lambda: manager.set(LevelPickerScreen)
-	
 	# We want to start with the launcher screen
-	manager.set(lambda surf, size, _: LaunchScreen(surf, size, start_game))
+	manager.set(LaunchScreen)
 	
 	# FPS manager
 	clock = pygame.time.Clock()
 	FPS = 45 # The constant refresh time
+	
+	MAX_RETRY_COUNT = 10 # Retry pygame errors in rendering up to this number of times.
+	retry_count = 0      # the number of times we've gone through the retry process.
 	
 	# Run the "game loop"
 	while True:	
@@ -58,7 +57,15 @@ def main():
 		refresh_time = clock.tick(FPS)
 		
 		# Refresh the display as needed
-		manager.render(refresh_time)
+		try:
+			manager.render(refresh_time)
+			retry_count = 0 # Reset the retry counter
+		except pygame.error: # Catch pygame errors, and retry
+			retry_count += 1 # Increment the retry counter
+			logging.exception("Retrying time #" + str(retry_count) + "; AT: " + datetime.datetime.now().isoformat())
+			if retry_count > MAX_RETRY_COUNT:
+				raise
+		
 		pygame.display.update()
 
 # Run the Script!
@@ -73,7 +80,7 @@ if __name__ == '__main__':
 		pass
 	except:	
 		# Log the exception to the log file
-		logging.exception("Date:" + datetime.datetime.now().isoformat())
+		logging.exception("AT: " + datetime.datetime.now().isoformat())
 		
 		# Exit pygame
 		pygame.quit()

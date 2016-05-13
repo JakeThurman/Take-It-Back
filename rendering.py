@@ -112,6 +112,9 @@ class Sprite(pygame.sprite.Sprite):
 		
 		# Update the rect
 		self.rect = self.image.get_rect()
+		
+	def is_hovered(self):
+		return self.rect.collidepoint(pygame.mouse.get_pos())
 
 class SpriteRenderer:
 	"""Handlers rendering sprites
@@ -125,6 +128,7 @@ class SpriteRenderer:
 		"""Renders the sprite to the screen
 		"""
 		self.surface.blit(sprite.image, sprite.rect if convert_rect == None else convert_rect(sprite.rect))
+		return sprite
 		
 class Camera:
 	"""Class for centering the screen on the player

@@ -228,16 +228,13 @@ class LevelPickerScreen(Screen):
 			self._dump_data_file()
 			
 		# Show the end game screeen
-		def create_end_game_screen(surface, screen_size, screen_manager):
-			completion_percentage = self._calculate_completion_percentage(my_rings, total_rings, my_health, data.player_health)
-			return GameWonScreen(surface, screen_size, screen_manager, True, lambda: self._play_level(data), completion_percentage=completion_percentage)
-		
-		self._screen_manager.set(create_end_game_screen)
+		completion_percentage = self._calculate_completion_percentage(my_rings, total_rings, my_health, data.player_health)
+		self._screen_manager.set(lambda surface, screen_size, screen_manager: GameWonScreen(surface, screen_size, screen_manager, lambda: self._play_level(data), completion_percentage))
 		
 	def _on_level_lost(self, data):		
 		self._add_to_failed(data)
 		# Show the end game screen
-		self._screen_manager.set(lambda surface, screen_size, screen_manager: GameLostScreen(surface, screen_size, screen_manager, False, lambda: self._play_level(data)))
+		self._screen_manager.set(lambda surface, screen_size, screen_manager: GameLostScreen(surface, screen_size, screen_manager, lambda: self._play_level(data)))
 		
 	def _dump_data_file(self):
 		# Update the data file with new data

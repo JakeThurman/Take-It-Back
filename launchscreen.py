@@ -1,7 +1,9 @@
-import pygame, sys, colors
+import pygame, sys, colors, resources
 from pygame.locals import *
 from rendering import *
 from screen import Screen
+from levelpickerscreen import LevelPickerScreen
+from settingsscreen import SettingsScreen
 
 class Logo(Sprite):
 	def __init__(self, x, y):
@@ -11,7 +13,7 @@ class LaunchScreen(Screen):
 	"""Renderers the splash screen
 	"""
 
-	def __init__(self, surface, screen_size, start_game_func):
+	def __init__(self, surface, screen_size, screen_manager):
 		"""Constructor
 		"""
 		# init parent class
@@ -24,29 +26,32 @@ class LaunchScreen(Screen):
 		
 		# Store settings
 		self.screen_size = screen_size
-		
-		# Store the click handler
-		self._start_game_func = start_game_func
+		self._screen_manager = screen_manager
 		
 	def handle_click(self):
-		"""Handles a click event by begining the game
+		"""Handles a click event
 		"""
-		self._start_game_func()
+		if self.choose_level_bttn.is_hovered:
+			self._screen_manager.set(LevelPickerScreen)
+		elif self.settings_bttn.is_hovered:
+			self._screen_manager.set(SettingsScreen)
+		elif self.quit_bttn.is_hovered:
+			pygame.quit()
+			sys.exit()
 		
 	def handle_key_up(self, key):
+		"""Handles a key up event by begining the game
+		"""
 		# Close the game if escape is pressed
 		if key == K_ESCAPE:
 			pygame.quit()
 			sys.exit()
 	
-		"""Handles a key up event by begining the game
-		"""
-		self._start_game_func()
 		
 	def _get_pos(self, n):
-		"""Gets the position for a link positioned {n + 1} from the bottom of the screen.
+		"""Gets the position for a link positioned {n} from the bottom of the screen.
 		"""
-		return ((self.screen_size[0]/8), self.screen_size[1]-((n + 1) * (self.screen_size[1]/8)))
+		return ((self.screen_size[0]/8), self.screen_size[1]-(n * (self.screen_size[1]/8)))
 	
 	def render(self, refresh_time):
 		"""Renderers the splash screen 
@@ -57,6 +62,7 @@ class LaunchScreen(Screen):
 		# Draw a logo image at the top-center of the screen
 		self.sprite_renderer.render(Logo(self.screen_size[0]/2 - 100, self.screen_size[1]/4))
 		
-		# Render a set of options_renderer
-		for i, text in enumerate(["Exit", "Settings", "Choose a Level"]):
-			self.option_renderer.render(text, self._get_pos(i), color=colors.SILVER)
+		# Render a set of options_renderer	
+		self.choose_level_bttn = self.option_renderer.render(resources.CHOOSE_A_LEVEL, self._get_pos(3), color=colors.SILVER)
+		self.settings_bttn     = self.option_renderer.render(resources.SETTINGS, self._get_pos(2), color=colors.SILVER)
+		self.quit_bttn         = self.option_renderer.render(resources.QUIT_GAME, self._get_pos(1), color=colors.SILVER)
