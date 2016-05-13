@@ -1,5 +1,6 @@
-# Jacob Thurman
-# Pygame helper classes for simplified renderering
+"""Pygame helper classes for simplified renderering
+Jacob Thurman
+"""
 
 import pygame, colors
 		
