@@ -6,13 +6,14 @@ My email is: jacob@thurmans.com
 Thanks!
 """
 
-import pygame, sys, resources
+import pygame, sys, resources, datetime, logging
+from tkinter import messagebox
 from pygame.locals import *
 from launchscreen import LaunchScreen
 from levelpickerscreen import LevelPickerScreen
 from screen import ScreenManager
 
-def main(FPS):
+def main():
 	pygame.init()
 	
 	# Initialize the window
@@ -25,13 +26,14 @@ def main(FPS):
 	manager = ScreenManager(DISPLAYSURF, screen_size)
 	
 	# Create a lambda event to use as a "start game" callback for the launch screen.
-	start_game = lambda: manager.set(lambda surf, size: LevelPickerScreen(surf, size, manager.set))
+	start_game = lambda: manager.set(LevelPickerScreen)
 	
 	# We want to start with the launcher screen
-	manager.set(lambda surf, size: LaunchScreen(surf, size, start_game))
+	manager.set(lambda surf, size, _: LaunchScreen(surf, size, start_game))
 	
 	# FPS manager
 	clock = pygame.time.Clock()
+	FPS = 45 # The constant refresh time
 	
 	# Run the "game loop"
 	while True:	
@@ -53,7 +55,7 @@ def main(FPS):
 		# Tell the pygame clock what we want the FPS to be
 		# this in turn responds with the time since the  
 		# last frame update which we provide to render().
-		refresh_time = clock.tick(FPS) 
+		refresh_time = clock.tick(FPS)
 		
 		# Refresh the display as needed
 		manager.render(refresh_time)
@@ -61,5 +63,21 @@ def main(FPS):
 
 # Run the Script!
 if __name__ == '__main__':
-	FPS = 45 # The constant refresh time
-	main(FPS)
+	# Configure the log file
+	logging.basicConfig(filename='dev/errors.log')
+	
+	# Run the main loop and wait for exceptions
+	try:
+		main()
+	except SystemExit: # Don't log SystemExit exceptions (thrown by sys.exit())
+		pass
+	except:	
+		# Log the exception to the log file
+		logging.exception("Date:" + datetime.datetime.now().isoformat())
+		
+		# Exit pygame
+		pygame.quit()
+		
+		# Alert the user that something bad happened
+		messagebox.showerror(resources.AN_EXCEPTION_OCCURED_TITLE, resources.AN_EXCEPTION_OCCURED)
+		

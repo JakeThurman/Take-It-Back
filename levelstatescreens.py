@@ -1,5 +1,4 @@
-"""
-	This file contains screens that exist to display state to the player
+"""This file contains screens that exist to display state to the player
 """
 
 import pygame, sys, colors, resources
@@ -7,12 +6,12 @@ from rendering import *
 from screen import Screen
 
 class EndGameScreen(Screen):
-	"""
-		The game has ended here is what we say...
+	"""The game has ended here is what we say...
 	"""
 	
-	def __init__(self, surface, screen_size, is_win, return_to_picker_screen_func, play_again_func, completion_percentage=None):
-		"""Constructor"""
+	def __init__(self, surface, screen_size, screen_manager, is_win, play_again_func, completion_percentage=None):
+		"""Constructor
+		"""
 	
 		super().__init__()
 		
@@ -22,16 +21,18 @@ class EndGameScreen(Screen):
 		
 		# Store settings and callbacks
 		self.screen_size = screen_size
-		self.is_win = is_win
+		self._screen_manager = screen_manager
+		self.is_win = is_win # TODO: move special win handling out to GameWonScreen and GameLostScreen
 		self.completion_percentage = completion_percentage
-		self.return_to_picker_screen_func = return_to_picker_screen_func
 		self.play_again_func = play_again_func
 				
 	def handle_click(self):
-		"""Handles a click event"""
-		
+		"""Handles a click event
+		"""
 		if self.return_to_level.is_hovered:
-			self.return_to_picker_screen_func()
+			# We need to go back twice here, once back to the level, again back to the picker
+			self._screen_manager.go_back()
+			self._screen_manager.go_back()
 		elif self.play_again.is_hovered:
 			self.play_again_func()
 		elif self.quit_button.is_hovered:
@@ -39,7 +40,8 @@ class EndGameScreen(Screen):
 			sys.exit()
 	
 	def render(self, refresh_time):
-		"""Renders the end game screen"""
+		"""Renders the end game screen
+		"""
 	
 		# Set the backgroud color
 		self.shape_renderer.render_rect((0, 0, self.screen_size[0], self.screen_size[1]), color=colors.DARK_GRAY, alpha=30)
@@ -64,14 +66,30 @@ class EndGameScreen(Screen):
 		self.return_to_level = self.option_renderer.render(resources.CHOOSE_A_LEVEL, (pos[0], self.screen_size[1]-(3*pos[1])), color=colors.SILVER)
 		self.play_again      = self.option_renderer.render(resources.PLAY_AGAIN, (pos[0], self.screen_size[1]-(2*pos[1])), color=colors.SILVER)
 		self.quit_button     = self.option_renderer.render(resources.QUIT_GAME, (pos[0], self.screen_size[1]-pos[1]), color=colors.SILVER)
+		
+	
+class GameWonScreen(EndGameScreen):
+	"""Win specific overload of the EndGameScreen
+	"""
+	def __init__(self, surface, screen_size, screen_manager, play_again_func, completion_percentage):
+		super().__init__(surface, screen_size, screen_manager, True, play_again_func, completion_percentage=completion_percentage)
+	
+	
+class GameLostScreen(EndGameScreen):
+	"""Loss specific overload of the EndGameScreen
+	"""
+	def __init__(self, surface, screen_size, screen_manager, play_again_func):
+		super().__init__(surface, screen_size, screen_manager, False, play_again_func)
+		raise("oops")
+		
 
 class PauseMenuScreen(Screen):
-	"""
-		A level is paused. Give the user the option to quit, restart etc.
+	"""A level is paused. Give the user the option to quit, restart etc.
 	"""
 
-	def __init__(self, surface, screen_size, level_name, return_to_picker_screen_func, restart_func, continue_game_func):
-		"""Constructor"""
+	def __init__(self, surface, screen_size, screen_manager, level_name, return_to_picker_screen_func, restart_func):
+		"""Constructor
+		"""
 		
 		super().__init__()
 		
@@ -81,13 +99,14 @@ class PauseMenuScreen(Screen):
 		
 		# Store settings and callbacks
 		self.screen_size = screen_size
+		self.screen_manager = screen_manager
 		self.level_name = level_name
 		self.return_to_picker_screen_func = return_to_picker_screen_func
 		self.restart_func = restart_func
-		self.continue_game_func = continue_game_func
 	
 	def handle_click(self):
-		"""Handles a click event"""
+		"""Handles a click event
+		"""
 	
 		if self.return_to_level.is_hovered:
 			self.return_to_picker_screen_func()
@@ -97,10 +116,11 @@ class PauseMenuScreen(Screen):
 			pygame.quit()
 			sys.exit()
 		elif self.continue_bttn.is_hovered:
-			self.continue_game_func()
+			self.screen_manager.go_back()
 	
 	def render(self, refresh_time):
-		"""Renders the pause screen"""
+		"""Renders the pause screen
+		"""
 	
 		# Set the backgroud color
 		self.shape_renderer.render_rect((0, 0, self.screen_size[0], self.screen_size[1]), color=colors.MID_GRAY, alpha=30)

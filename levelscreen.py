@@ -17,7 +17,8 @@ class _settings:
 	CAMERA_ADJUST_PIXELS = 25 
 
 class HealthBar:
-	"""The side scroll game status bar"""
+	"""The side scroll game status bar
+	"""
 	# Constants
 	HEIGHT = 15
 	
@@ -51,7 +52,8 @@ class HealthBar:
 		self.shape_renderer.render_rect((full_bar_size[0], full_bar_size[1], full_bar_size[2] * (self.player.health/self.player.initial_health), full_bar_size[3]), color=self._get_curr_color())
 
 class LevelRings:
-	"""Rendering class for the rings display for a level"""
+	"""Rendering class for the rings display for a level
+	"""
 	def __init__(self, surface):
 		self.sprite_renderer = SpriteRenderer(surface)
 		
@@ -60,11 +62,12 @@ class LevelRings:
 			self.sprite_renderer.render(Ring(right - ((i + 1) * Level.OBJECT_SIZE), top, grayscale=(total_stars-i)>stars))
 
 class LevelScreen(Screen):
-	"""Handles rendering of the actual side scrolling game"""
+	"""Handles rendering of the actual side scrolling game
+	"""
 	
 	# Constructor
 	# NOTE: This c'tor is not a legal Screen.ScreenManger factory
-	def __init__(self, surface, screen_size, level_title, level_file, player_health, win_func, lose_func, set_screen_func, return_to_picker_func, restart_me_func):	
+	def __init__(self, surface, screen_size, screen_manager, level_title, level_file, player_health, win_func, lose_func, return_to_picker_func, restart_me_func):	
 		super().__init__()	
 		
 		# Store the passed in values (we don't surface as a global)
@@ -72,7 +75,7 @@ class LevelScreen(Screen):
 		self.level_title = level_title
 		self._on_win_func = win_func
 		self._on_lose_func = lose_func
-		self._set_screen_func = set_screen_func
+		self._screen_manager = screen_manager
 		self._return_to_picker_func = return_to_picker_func
 		self._restart_me_func = restart_me_func
 				
@@ -115,10 +118,7 @@ class LevelScreen(Screen):
 			self._pause_game()
 	
 	def _pause_game(self):
-		self._set_screen_func(lambda surface, screen_size: PauseMenuScreen(surface, screen_size, self.level_title, self._return_to_picker_func, self._restart_me_func, self._go_to_me))
-			
-	def _go_to_me(self):
-		self._set_screen_func(lambda surface, screen_size: self)
+		self._screen_manager.set(lambda surface, screen_size, screen_manager: PauseMenuScreen(surface, screen_size, screen_manager, self.level_title, self._return_to_picker_func, self._restart_me_func))
 	
 	# Handles key down events, and stores a flag for any of the keys we are listening for
 	def handle_key_down(self, key):

@@ -8,7 +8,7 @@ import pygame, sys, colors, json, resources
 from rendering import *
 from screen import Screen
 from pygame.locals import *
-from levelstatescreens import EndGameScreen
+from levelstatescreens import GameWonScreen, GameLostScreen
 from levelscreen import LevelScreen
 
 class _consts:
@@ -96,7 +96,7 @@ class LevelPickerScreen(Screen):
 	# Constants 
 	LINK_TEXT_SIZE = 25
 	
-	def __init__(self, surface, screen_size, set_screen_func):		
+	def __init__(self, surface, screen_size, screen_manager):		
 		"""Constructor"""
 		super().__init__()
 	
@@ -108,7 +108,7 @@ class LevelPickerScreen(Screen):
 		self.sprite_renderer = SpriteRenderer(surface)
 		
 		# Store passed in values as needed
-		self._set_screen_func = set_screen_func
+		self._screen_manager = screen_manager
 		self.screen_size = screen_size
 		
 		# Create links to all the levels we need
@@ -177,7 +177,7 @@ class LevelPickerScreen(Screen):
 		quit = lambda: self._quit_level(data)
 		
 		# Now set the screen to the chosen level!
-		self._set_screen_func(lambda surface, screen_size: LevelScreen(surface, screen_size, data.name, data.file_path, data.player_health, win, lose, self._set_screen_func, quit, restart))
+		self._screen_manager.set(lambda surface, screen_size, screen_manager: LevelScreen(surface, screen_size, screen_manager, data.name, data.file_path, data.player_health, win, lose, quit, restart))
 		
 	def _quit_level(self, data):
 		self._add_to_failed(data)
@@ -195,7 +195,7 @@ class LevelPickerScreen(Screen):
 		
 	def _go_to_me(self):
 		# Set the screen to this object
-		self._set_screen_func(lambda surface, screen_size: self)
+		self._screen_manager.set(lambda _, __, ___: self)
 		
 	def _on_level_won(self, data, total_rings, my_rings, my_health):
 		data_changed = False
@@ -226,15 +226,18 @@ class LevelPickerScreen(Screen):
 		# Update the data file if need be
 		if data_changed:
 			self._dump_data_file()
-	
+			
 		# Show the end game screeen
-		completion_percentage = self._calculate_completion_percentage(my_rings, total_rings, my_health, data.player_health)
-		self._set_screen_func(lambda surface, screen_size: EndGameScreen(surface, screen_size, True, self._go_to_me, lambda: self._play_level(data), completion_percentage=completion_percentage))
+		def create_end_game_screen(surface, screen_size, screen_manager):
+			completion_percentage = self._calculate_completion_percentage(my_rings, total_rings, my_health, data.player_health)
+			return GameWonScreen(surface, screen_size, screen_manager, True, lambda: self._play_level(data), completion_percentage=completion_percentage)
+		
+		self._screen_manager.set(create_end_game_screen)
 		
 	def _on_level_lost(self, data):		
 		self._add_to_failed(data)
 		# Show the end game screen
-		self._set_screen_func(lambda surface, screen_size: EndGameScreen(surface, screen_size, False, self._go_to_me, lambda: self._play_level(data)))
+		self._screen_manager.set(lambda surface, screen_size, screen_manager: GameLostScreen(surface, screen_size, screen_manager, False, lambda: self._play_level(data)))
 		
 	def _dump_data_file(self):
 		# Update the data file with new data
