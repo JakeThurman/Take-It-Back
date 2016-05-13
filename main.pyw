@@ -1,6 +1,14 @@
+"""Hey, Welcome to the code for the game.
+
+If there's anything I can help you with, let me know.
+
+My email is: jacob@thurmans.com
+Thanks!
+"""
+
 import pygame, sys, resources
 from pygame.locals import *
-from splashscreen import SplashScreen
+from launchscreen import LaunchScreen
 from levelpickerscreen import LevelPickerScreen
 from screen import ScreenManager
 
@@ -16,16 +24,11 @@ def main(FPS):
 	# This will handle switching from screen to screen for us
 	manager = ScreenManager(DISPLAYSURF, screen_size)
 	
-	# On click of the splash screen, we want to set the screen to the side scroller screen.
-	# This is a weird looking line, I know, but bare with it.
-	# We first take the current screen (the SplashScreen we just set) using manager.get(),
-	# We then tell the screen that when we click it, (set_on_click) to call our lambda.
-	# that lambda gives the manager a new screen using manager.set. The lambda that we pass in there
-	# is a factory to create a new SideScrollLevelPickerScreen with those two parameters.
-	click_event = lambda: manager.set(lambda surf, size: LevelPickerScreen(surf, size, manager.set))
+	# Create a lambda event to use as a "start game" callback for the launch screen.
+	start_game = lambda: manager.set(lambda surf, size: LevelPickerScreen(surf, size, manager.set))
 	
-	# We want to start with the splash screen
-	manager.set(lambda surf, size: SplashScreen(surf, size, click_event))
+	# We want to start with the launcher screen
+	manager.set(lambda surf, size: LaunchScreen(surf, size, start_game))
 	
 	# FPS manager
 	clock = pygame.time.Clock()

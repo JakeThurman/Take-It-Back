@@ -17,11 +17,11 @@ class WallOpenDir:
 	def get_file_name(dir):
 		# We start with a map object...
 		map = {
-			WallOpenDir.NONE: "wall/wall.png",
-			WallOpenDir.LEFT_ONLY: "wall/left_only.png",
-			WallOpenDir.RIGHT_ONLY: "wall/right_only.png",
-			WallOpenDir.UP_ONLY: "wall/up_only.png",
-			WallOpenDir.DOWN_ONLY: "wall/down_only.png",
+			WallOpenDir.NONE: "images/world/wall.png",
+			WallOpenDir.LEFT_ONLY: "images/world/left_only.png",
+			WallOpenDir.RIGHT_ONLY: "images/world/right_only.png",
+			WallOpenDir.UP_ONLY: "images/world/up_only.png",
+			WallOpenDir.DOWN_ONLY: "images/world/down_only.png",
 		}
 		# Then return the needed value.
 		return map[dir]
@@ -61,7 +61,7 @@ class WinBlock(Sprite):
 	"""
 	def __init__(self, x, y):
 		# Init the parent class
-		super().__init__(x, y, "wall/win_block.png")
+		super().__init__(x, y, "images/world/win_block.png")
 		
 class HealthPack(Sprite):
 	"""
@@ -70,7 +70,7 @@ class HealthPack(Sprite):
 	"""
 	def __init__(self, x, y):
 		# Init the parent class
-		super().__init__(x, y, "wall/health_pack.png")
+		super().__init__(x, y, "images/world/health_pack.png")
 		
 class Ring(Sprite):
 	"""
@@ -79,7 +79,7 @@ class Ring(Sprite):
 	"""
 	def __init__(self, x, y, grayscale=False):
 		# Init the parent class
-		super().__init__(x, y, "wall/ring.png", use_alpha=True, grayscale=grayscale)
+		super().__init__(x, y, "images/world/ring.png", use_alpha=True, grayscale=grayscale)
 		
 class Weapon(Sprite):
 	"""
@@ -88,7 +88,7 @@ class Weapon(Sprite):
 	"""	
 	def __init__(self, x, y, power):
 		# Init the parent class
-		super().__init__(x, y, "wall/weapon.png", use_alpha=True)
+		super().__init__(x, y, "images/world/weapon.png", use_alpha=True)
 		# Don't let users pass through these blocks
 		self.dir = WallOpenDir.NONE
 		# Store the power
@@ -122,7 +122,7 @@ class Spawner(Sprite):
 	
 	def __init__(self, x, y, power):
 		# Init the parent class
-		super().__init__(x, y, "wall/spawner.png", use_alpha=True)
+		super().__init__(x, y, "images/world/spawner.png", use_alpha=True)
 		# Don't let users pass through these blocks
 		self.dir = WallOpenDir.NONE
 		# Store the power
@@ -172,7 +172,7 @@ class Bullet(Sprite):
 	# C'tor
 	def __init__(self, x, y, right, maker, power):
 		# Call the parent c'tor
-		super().__init__(x, y, "wall/laser.png", use_alpha=True)
+		super().__init__(x, y, "images/world/laser.png", use_alpha=True)
 		
 		# Store other info
 		self.direction_is_right = right
@@ -264,7 +264,7 @@ class Baddie(LivingThing):
 	def __init__(self, x, y, maker, power, before_death_func):		
 		"""Constructor"""
 		# Call the parent c'tor
-		super().__init__(x, y, "actions/baddie_idle.png", use_alpha=True)
+		super().__init__(x, y, "images/actions/baddie_idle.png", use_alpha=True)
 		
 		# Initialize other locals
 		self.maker = maker
@@ -282,7 +282,7 @@ class Baddie(LivingThing):
 		
 	def _set_dying(self):
 		self._is_dying = True
-		self.image = pygame.image.load("actions/baddie_dying.png").convert_alpha()
+		self.image = pygame.image.load("images/actions/baddie_dying.png").convert_alpha()
 		
 	def update(self, refresh_time, bad_entities, camera, obstacles, player, on_die, on_game_over):	
 		"""Updates the baddie object based on the current given state"""
@@ -360,14 +360,14 @@ class Player(LivingThing):
 	def __init__(self, x, y, initial_health):
 		# Store the names of all of the images
 		self._images =  { 
-			"run_left": "actions/run_left.png",
-			"run_right": "actions/run_right.png",
-			"idle_left": 'actions/idle_left.png',
-			"idle_right": 'actions/idle_right.png',
-			"jump_left": "actions/jump_left.png",
-			"jump_right": "actions/jump_right.png",
-			"down_left": "actions/down_left.png",
-			"down_right": "actions/down_right.png"
+			"run_left": "images/actions/run_left.png",
+			"run_right": "images/actions/run_right.png",
+			"idle_left": 'images/actions/idle_left.png',
+			"idle_right": 'images/actions/idle_right.png',
+			"jump_left": "images/actions/jump_left.png",
+			"jump_right": "images/actions/jump_right.png",
+			"down_left": "images/actions/down_left.png",
+			"down_right": "images/actions/down_right.png"
 		}
 		
 		# Call the parent c'tor
@@ -533,9 +533,7 @@ class Level(object):
 		height = (len(lines)) * self.OBJECT_SIZE
 		return (width, height)
 		
-	"""
-		private helper functions
-	"""
+	"""private helper functions"""
 	def _add(self, sprite, *lists):
 		for list in lists:
 			list.append(sprite)
@@ -549,7 +547,7 @@ class Level(object):
 	def _increment_stars(self):
 		self.stars += 1
 		
-	def _update(self, list, action):
+	def _remove_on_touch(self, list, action):
 		for item in list:
 			if self.player.rect.colliderect(item): # If this item is being touched
 				action() # Perform the custom action
@@ -560,7 +558,7 @@ class Level(object):
 		NOTE: Non-complete set of update functions.
 	"""
 	def update_health_packs(self):
-		self._update(self.health_packs, lambda: self.player.give_health(self.init_player_health/5)) # Fill the player's health by 20%
+		self._remove_on_touch(self.health_packs, lambda: self.player.give_health(self.init_player_health/4)) # Fill the player's health by 25%
 	
 	def update_bonus_stars(self):
-		self._update(self.bonus_stars, self._increment_stars)
+		self._remove_on_touch(self.bonus_stars, self._increment_stars)

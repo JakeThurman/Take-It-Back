@@ -3,8 +3,18 @@
     "levels/tutorials/hello-world.map"
   ], 
   "completed": {
+    "levels/default/level1.map": {
+      "rings": 0, 
+      "total-rings": 0, 
+      "health": 20
+    }, 
     "levels/tutorials/med-pack.map": {
-      "health": 13, 
+      "health": 20, 
+      "total-rings": 0, 
+      "rings": 0
+    }, 
+    "levels/tutorials/bad-guys.map": {
+      "health": 20, 
       "total-rings": 0, 
       "rings": 0
     }
@@ -12,7 +22,8 @@
   "packages": [
     "tutorials", 
     "default"
-  ],
+  ], 
   "unlocked": [
+    "levels/default/level2.map"
   ]
 }

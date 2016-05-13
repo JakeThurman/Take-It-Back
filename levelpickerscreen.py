@@ -65,16 +65,16 @@ class _consts:
 # screeen for failed and completed levels respectfully.
 class FailedIcon(Sprite):
 	def __init__(self, x, y):
-		super().__init__(x, y, "icons/x-mark.png", use_alpha=True)
+		super().__init__(x, y, "images/icons/x-mark.png", use_alpha=True)
 
 class CompletedIcon(Sprite):
 	def __init__(self, x, y):
-		super().__init__(x, y, "icons/check.png", use_alpha=True)
+		super().__init__(x, y, "images/icons/check.png", use_alpha=True)
 		
 # Sprite icon for locked levels.
 class LockedIcon(Sprite):
 	def __init__(self, x, y):
-		super().__init__(x, y, "icons/locked.png", use_alpha=True)
+		super().__init__(x, y, "images/icons/locked.png", use_alpha=True)
 	
 # Helper class, for getting named valus for level links (and header)
 class LevelLine:

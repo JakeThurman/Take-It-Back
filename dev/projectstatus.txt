@@ -17,11 +17,13 @@ Project TODOs/Ideas:
 	- Add In game level editor
 	- Add package import/export
 	
+	- Replace Splash Screen with new "Launcher" screen
+	
+	- Add Sound Effects & BG music.
+	
 	
 
 Steam TODOs:
-	- Hide the console.
-	- Replace Splash Screen with new "Launcher" screen
-	- Add useful exception logging.
 	- Create more levels.
-	- Add Sound Effects & BG music.
+	- Add useful exception logging.
+	- Create an installer
