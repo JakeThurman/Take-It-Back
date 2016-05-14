@@ -22,8 +22,10 @@ Project TODOs/Ideas:
 	- Other:
 		- Support Full Screen Mode
 		- Add Sound Effects & BG music.
+		- Stop relying on System fonts.
 	
 	- Requirements:
-		- Design Settings Screen
+		- Finish Settings Screen
 		- Create more levels.
 		- Create an installer
+		- Fix All in BUGS

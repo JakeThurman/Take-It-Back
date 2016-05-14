@@ -17,3 +17,9 @@ RESTART_LEVEL = "Restart"
 COMPLETION_PERCENTAGE = "You scored {0}%"
 CONTINUE_GAME = "Continue"
 PAUSED_MESSAGE = """"{0}" is Paused"""
+
+# Settings
+JUMP_KEY_NAME = "Jump"
+CROUCH_KEY_NAME = "Crouch"
+MOVE_LEFT_KEY_NAME = "Left"
+MOVE_RIGHT_KEY_NAME = "Right"

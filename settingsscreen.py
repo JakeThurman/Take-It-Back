@@ -1,6 +1,7 @@
-import colors
-from rendering import Sprite, SpriteRenderer, ShapeRenderer
+import colors, resources, settingsmanager
+from rendering import *
 from screen import Screen
+from pygame.locals import *
 
 class BackIcon(Sprite):
 	"""A simple back arrow icon.
@@ -21,6 +22,7 @@ class SettingsScreen(Screen):
 		
 		# Create dependencies
 		self.sprite_renderer = SpriteRenderer(surface)
+		self.option_renderer = OptionRenderer(surface, pygame.font.SysFont("monospace", 30))
 		self.shape_renderer = ShapeRenderer(surface)
 	
 	def handle_click(self):
@@ -33,3 +35,10 @@ class SettingsScreen(Screen):
 		
 		# Render the back button
 		self.back_bttn = self.sprite_renderer.render(BackIcon(self.screen_size[0] - self.screen_size[0]/8, self.screen_size[1]/8))
+				
+		# Render the settings
+		i = 1
+		for key, title, value in settingsmanager.get_user_settings():
+			self.option_renderer.render(title, (30, i * 40), color=colors.SILVER, hover_color=colors.SILVER)
+			self.option_renderer.render(value, (250, i * 40))
+			i += 1
