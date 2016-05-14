@@ -11,6 +11,7 @@ from tkinter import messagebox
 from pygame.locals import *
 from launchscreen import LaunchScreen
 from screen import ScreenManager
+from levelpickerscreen import LevelPickerScreen
 
 def main():
 	pygame.init()
@@ -28,7 +29,7 @@ def main():
 	manager = ScreenManager(DISPLAYSURF, screen_size)
 	
 	# We want to start with the launcher screen
-	manager.set(LaunchScreen)
+	manager.set(lambda *args: LaunchScreen(*args, picker_screen_factory=LevelPickerScreen))
 	
 	# FPS manager
 	clock = pygame.time.Clock()

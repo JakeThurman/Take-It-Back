@@ -2,12 +2,7 @@ import colors, resources, settingsmanager
 from rendering import *
 from screen import Screen
 from pygame.locals import *
-
-class BackIcon(Sprite):
-	"""A simple back arrow icon.
-	"""
-	def __init__(self, x, y):
-		super().__init__(x, y, "images/icons/back-arrow.png", use_alpha=True)
+from icons import BackIcon
 
 class SettingsScreen(Screen):
 	"""Allows the user to choose settings such as the key mappings
@@ -28,6 +23,11 @@ class SettingsScreen(Screen):
 	def handle_click(self):
 		if self.back_bttn.is_hovered():
 			self._screen_manager.go_back()
+			
+	def handle_key_up(self, key):
+		# Escape should mean return
+		if key == K_ESCAPE:
+			self._screen_manager.go_back()
 	
 	def render(self, refresh_time):
 		# Set the backgroud color
@@ -39,6 +39,6 @@ class SettingsScreen(Screen):
 		# Render the settings
 		i = 1
 		for key, title, value in settingsmanager.get_user_settings():
-			self.option_renderer.render(title, (30, i * 40), color=colors.SILVER, hover_color=colors.SILVER)
+			self.option_renderer.render(title, (40, i * 40), color=colors.SILVER, hover_color=colors.SILVER)
 			self.option_renderer.render(value, (250, i * 40))
 			i += 1

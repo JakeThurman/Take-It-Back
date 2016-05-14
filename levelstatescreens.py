@@ -28,13 +28,22 @@ class EndGameScreen(Screen):
 		self.completion_percentage = completion_percentage
 		self.play_again_func = play_again_func
 				
+	def _go_to_level_picker(self):
+		# We need to go back twice here, once back to the level, again back to the picker
+		self._screen_manager.go_back()
+		self._screen_manager.go_back()
+	
+	def handle_key_up(self, key):
+		"""When the user presses the ESC key, assume they wan to 
+		"""
+		if key == K_ESCAPE:
+			self._go_to_level_picker()
+	
 	def handle_click(self):
 		"""Handles a click event
 		"""
 		if self.return_to_level.is_hovered:
-			# We need to go back twice here, once back to the level, again back to the picker
-			self._screen_manager.go_back()
-			self._screen_manager.go_back()
+			self._go_to_level_picker()
 		elif self.play_again.is_hovered:
 			self.play_again_func()
 		elif self.quit_button.is_hovered:
@@ -108,7 +117,6 @@ class PauseMenuScreen(Screen):
 	def handle_click(self):
 		"""Handles a click event
 		"""
-	
 		if self.return_to_level.is_hovered:
 			self.return_to_picker_screen_func()
 		elif self.restart.is_hovered:

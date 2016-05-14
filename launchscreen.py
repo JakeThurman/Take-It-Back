@@ -2,7 +2,6 @@ import pygame, sys, colors, resources
 from pygame.locals import *
 from rendering import *
 from screen import Screen
-from levelpickerscreen import LevelPickerScreen
 from settingsscreen import SettingsScreen
 
 class Logo(Sprite):
@@ -13,7 +12,7 @@ class LaunchScreen(Screen):
 	"""Renderers the splash screen
 	"""
 
-	def __init__(self, surface, screen_size, screen_manager):
+	def __init__(self, surface, screen_size, screen_manager, picker_screen_factory):
 		"""Constructor
 		"""
 		# init parent class
@@ -27,12 +26,13 @@ class LaunchScreen(Screen):
 		# Store settings
 		self.screen_size = screen_size
 		self._screen_manager = screen_manager
+		self._picker_screen_factory = picker_screen_factory
 		
 	def handle_click(self):
 		"""Handles a click event
 		"""
 		if self.choose_level_bttn.is_hovered:
-			self._screen_manager.set(LevelPickerScreen)
+			self._screen_manager.set(self._picker_screen_factory)
 		elif self.settings_bttn.is_hovered:
 			self._screen_manager.set(SettingsScreen)
 		elif self.quit_bttn.is_hovered:

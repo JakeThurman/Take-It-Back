@@ -1,6 +1,6 @@
-# Jake Thurman
-# CIS-226 Game Scripting
-# Screen Helper Classes
+"""Jake Thurman
+Screen Helper Classes
+"""
 
 import pygame, sys
 from pygame.locals import K_ESCAPE

@@ -3,13 +3,6 @@ Project TODOs/Ideas:
 		- Baddies sometimes fall out of screen
 		- Make level picker screen scroll so you >~10 levels
 	
-	- UX:
-		- "?" or "HELP" button which explains controls 
-			- SideScrollLevelPickerScreen
-			- PauseMenuScreen
-		- Back Button
-		- Add a link to settings from pause menu
-	
 	- Mechanics:
 		- Should jumping on baddie's heads kill them?
 	
@@ -28,4 +21,3 @@ Project TODOs/Ideas:
 		- Finish Settings Screen
 		- Create more levels.
 		- Create an installer
-		- Fix All in BUGS
