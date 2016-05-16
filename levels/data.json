@@ -1,48 +1,55 @@
 {
-  "failed": [
-    "levels/tutorials/hello-world.map", 
-    "levels/difficult/quite-difficult.map"
-  ], 
+  "failed": [], 
   "completed": {
-    "levels/default/level3.map": {
-      "rings": 2, 
-      "total-rings": 4, 
-      "health": 20
-    }, 
-    "levels/default/super-easy.map": {
-      "rings": 0, 
-      "total-rings": 0, 
-      "health": 20
-    }, 
-    "levels/default/level2.map": {
-      "rings": 0, 
-      "total-rings": 6, 
-      "health": 20
-    }, 
-    "levels/tutorials/bad-guys.map": {
-      "rings": 0, 
-      "total-rings": 0, 
-      "health": 20
-    }, 
-    "levels/tutorials/one-way-walls.map": {
-      "rings": 0, 
-      "total-rings": 0, 
-      "health": 20
-    }, 
-    "levels/tutorials/med-pack.map": {
-      "rings": 0, 
-      "total-rings": 0, 
-      "health": 20
-    }, 
-    "levels/tutorials/ring-around-the-rosie.map": {
-      "rings": 2, 
-      "total-rings": 3, 
-      "health": 20
-    }, 
-    "levels/default/level1.map": {
+    "levels/tutorials/hello-world.map": {
       "health": 20, 
       "total-rings": 0, 
       "rings": 0
+    }, 
+    "levels/default/level3.map": {
+      "health": 20, 
+      "total-rings": 4, 
+      "rings": 4
+    }, 
+    "levels/default/level2.map": {
+      "health": 20, 
+      "total-rings": 6, 
+      "rings": 0
+    }, 
+    "levels/difficult/quite-difficult.map": {
+      "health": 5, 
+      "total-rings": 6, 
+      "rings": 5
+    }, 
+    "levels/default/super-easy.map": {
+      "health": 20, 
+      "total-rings": 0, 
+      "rings": 0
+    }, 
+    "levels/tutorials/bad-guys.map": {
+      "health": 20, 
+      "total-rings": 0, 
+      "rings": 0
+    }, 
+    "levels/tutorials/one-way-walls.map": {
+      "health": 20, 
+      "total-rings": 0, 
+      "rings": 0
+    }, 
+    "levels/tutorials/med-pack.map": {
+      "health": 20, 
+      "total-rings": 0, 
+      "rings": 0
+    }, 
+    "levels/tutorials/ring-around-the-rosie.map": {
+      "health": 20, 
+      "total-rings": 3, 
+      "rings": 3
+    }, 
+    "levels/default/level1.map": {
+      "rings": 0, 
+      "total-rings": 0, 
+      "health": 20
     }
   }, 
   "packages": [
@@ -50,14 +57,14 @@
     "default", 
     "difficult"
   ], 
-  "unlocked": [
-    "levels/default/level2.map", 
-    "levels/default/level3.map"
-  ], 
   "settings": {
     "jump": "w", 
     "right": "d", 
     "crouch": "s", 
     "left": "a"
-  }
+  }, 
+  "unlocked": [
+    "levels/default/level2.map", 
+    "levels/default/level3.map"
+  ]
 }

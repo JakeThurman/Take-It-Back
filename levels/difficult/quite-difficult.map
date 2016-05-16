@@ -17,8 +17,8 @@
          X                                                     X         UUUUU                       X                
          X                                                     X                                     X                
          X                                                     X                                     X                
-         X3                                                   4X                                     X                
-         X8                                                   9X          +++                        X                
+         X3                                                   2X                                     X                
+         X8                                                   6X          +++                        X                
          XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX             X                
          X                                                                             X             X                
          X                                                                             X             X                
@@ -42,7 +42,7 @@
          X  X     X      X      X X    X X       7XXXXXXXXXXXXXXXX5   XXXXXXXXXXXXXXXXX        X     X                 
          X  X     X      X      X X    X X                       XXXXXX               L        X     X                
          X  X     X      X  ++  X X    X X                                            L        X     X                
-         XXXXUUUUUXXXXXXXXUUUUUUX X    X X5                                           L        X     X                
+         XXXXUUUUUXXXXXXXXUUUUUUX X    X X2                                           L        X     X                
          X               L      X X    X XX    U                                      XXXXXXXXXX     X                
          X     *         L      X X    X X                                                     X     X                
          X               L      X X    X X          XXX                                        X     X                
@@ -54,9 +54,9 @@
          X               L      X X    X X                                        X    X       X     X                
          X               L      X X    X X                  R                     X    X       X     X                
          X               L      X X    X X                  R                     X    X       X     X                
-         X               L      X X    X X                  R                     X    X       L     X                
-         X               L      X X    X X                  R                    5X    X       L     X                
-         X      XXXXXXXXXXUUUUUUXXX    XXX       XXXXXXXXXXXXXXXXXXXXXXXXXX  XXXXXX++++XUUUUUUUL     X                
+         X               L      X X    X X                  R                     X    X       X     X                
+         X               L      X X    X X                  R                    2X    X       X     X                
+         X      XXXXXXXXXXUUUUUUXXX    XXX       XXXXXXXXXXXXXXXXXXXXXXXXXX  XXXXXX++++XUUUUUUUX     X                
          X               R                       X                        X                    L     X                 
          X               R                       X                        X                    L     X                 
          X               R                       X                        X                    L     X                
@@ -69,7 +69,7 @@
          X                        X    X         XX      XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX     X                
          X                        X    X         XX      X                                     X     X                
          X                        X *+ X         XX      X                                     X     X                
-         XXXXXXXXXXXXXXXXXXXXXXXXXXUUUUXXXXXXXXXXXX      XXXXXXXXXXX9XXXXXXXXXXXXXXXXXXXXXXXXXXX     X                
+         XXXXXXXXXXXXXXXXXXXXXXXXXXUUUUXXXXXXXXXXXX      XXXXXXXXXXX6XXXXXXXXXXXXXXXXXXXXXXXXXXX     X                
          W                                                                                           X                
          W                                                                                           X                
          W                                                                                           X                
