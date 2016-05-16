@@ -1,12 +1,17 @@
 {
   "failed": [
     "levels/tutorials/hello-world.map", 
-    "levels/tutorials/one-way-walls.map"
+    "levels/difficult/quite-difficult.map"
   ], 
   "completed": {
     "levels/default/level3.map": {
       "rings": 2, 
       "total-rings": 4, 
+      "health": 20
+    }, 
+    "levels/default/super-easy.map": {
+      "rings": 0, 
+      "total-rings": 0, 
       "health": 20
     }, 
     "levels/default/level2.map": {
@@ -15,6 +20,11 @@
       "health": 20
     }, 
     "levels/tutorials/bad-guys.map": {
+      "rings": 0, 
+      "total-rings": 0, 
+      "health": 20
+    }, 
+    "levels/tutorials/one-way-walls.map": {
       "rings": 0, 
       "total-rings": 0, 
       "health": 20
@@ -37,7 +47,8 @@
   }, 
   "packages": [
     "tutorials", 
-    "default"
+    "default", 
+    "difficult"
   ], 
   "unlocked": [
     "levels/default/level2.map", 
