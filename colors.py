@@ -16,13 +16,3 @@ MID_GREEN = (72, 231, 84)
 PALE_GREEN = (152,251,152)
 TOMATO = (255,80,70)
 SILVER = (194, 194, 194)
-
-
-# Convers an image to the grayscale equivenlent
-def to_grayscale(image):
-	width, height = image.get_size() 
-	for x in range(width): 
-		for y in range(height): 
-			red, green, blue, alpha = image.get_at((x, y)) 
-			gs = 0.3 * red + 0.59 * green + 0.11 * blue 
-			image.set_at((x, y), (gs, gs, gs, alpha))

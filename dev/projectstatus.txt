@@ -1,7 +1,6 @@
 Project TODOs/Ideas:
 	- BUGS:
 		- Baddies sometimes fall out of screen
-		- Make level picker screen scroll so you >~10 levels
 	
 	- Mechanics:
 		- Should jumping on baddie's heads kill them?
@@ -15,9 +14,11 @@ Project TODOs/Ideas:
 	- Other:
 		- Support Full Screen Mode
 		- Add Sound Effects & BG music.
-		- Stop relying on System fonts.
+		- Fix camera jerking by adding "Camera Slack"
 	
 	- Requirements:
 		- Finish Settings Screen
-		- Create more levels.
 		- Create an installer
+		- Stop relying on System fonts.
+		- Create more levels.
+		- Make level picker screen scroll so you >~10 levels

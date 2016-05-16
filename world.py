@@ -74,12 +74,12 @@ class HealthPack(Sprite):
 		
 class Ring(Sprite):
 	"""
-		Class for "Bonus Star"/"Ring" blocks 
+		Class for "Bonus Ring" blocks 
 		.map file: *
 	"""
 	def __init__(self, x, y, grayscale=False):
 		# Init the parent class
-		super().__init__(x, y, "images/world/ring.png", use_alpha=True, grayscale=grayscale)
+		super().__init__(x, y, "images/world/ring_grayscale.png" if grayscale else "images/world/ring.png", use_alpha=True)
 		
 class Weapon(Sprite):
 	"""
@@ -98,17 +98,17 @@ class Weapon(Sprite):
 		# Say that we are halfway through our wait to fire initially.
 		self.last_fire_ticks = (self.min_fire_interval / 2)
 	
-	def update(self, refresh_time, camera, player, obstacles, add_entity_func):
+	def update(self, refresh_time, player, obstacles, add_entity_func):
 		# Increment the wait counter with the time since the last update
 		self.last_fire_ticks += refresh_time
 		
 		# If we haven't waited long enough, we don't want to fire. Then, check 
-		# a randomly generated integer in the range [0, 5 * (10 - power)]; if
+		# a randomly generated integer in the range [0, 5 * (10 - power/2)]; if
 		# that randomly returns 1, we want to fire
 		should_fire = self.last_fire_ticks > self.min_fire_interval and random.randint(0, 5 * (10 - int(self.power/2))) == 1;
 		
 		# If the random number genderation says we should shoot, and we can see the player, shoot!
-		if should_fire and camera.can_see(self):	
+		if should_fire:	
 			is_right = player.rect.center[0] > self.rect.center[0]
 			add_entity_func(Bullet(self.rect.right if is_right else self.rect.left, self.rect.center[1], is_right, self, self.power + 1))
 			self.last_fire_ticks = 0 # Reset the wait counter
@@ -118,7 +118,7 @@ class Spawner(Sprite):
 		Class for spawner blacks 
 		.map file 6-9
 	"""	
-	SPAWN_PER_POWER_RATE = 0.3
+	SPAWN_PER_POWER_RATE = 0.65
 	
 	def __init__(self, x, y, power):
 		# Init the parent class
@@ -137,7 +137,7 @@ class Spawner(Sprite):
 	def _on_spawn_die(self, spawn):
 		self.spawn.remove(spawn)
 	
-	def update(self, refresh_time, camera, player, obstacles, add_entity_func):	
+	def update(self, refresh_time, player, obstacles, add_entity_func):	
 		# Increment the wait counter with the time since the last update
 		self.last_fire_ticks += refresh_time
 		
@@ -148,7 +148,7 @@ class Spawner(Sprite):
 		should_fire = self.last_fire_ticks > self.min_fire_interval and len(self.spawn) < self.power*self.SPAWN_PER_POWER_RATE and random.randint(0, 60 * (10 - self.power)) == 1;
 		
 		# If the random number genderation says we should shoot, and we can see the player, shoot!
-		if should_fire and camera.can_see(self):
+		if should_fire:
 			is_right = player.rect.center[0] > self.rect.center[0]
 			x = self.rect.left if is_right else self.rect.left - self.rect.width
 			y = self.rect.topleft[1] + random.randrange(-5, 5)
@@ -185,7 +185,7 @@ class Bullet(Sprite):
 		self.lifetime += self.MAX_LIFETIME_MS
 	
 	# Upodates the bullet, 
-	def update(self, refresh_time, bad_entities, camera, obstacles, player, on_die, on_game_over):
+	def update(self, refresh_time, bad_entities, obstacles, player, on_die, on_game_over):
 		self.lifetime += refresh_time
 		
 		# If this bullet has lasted for more than {MAX_LIFETIME_MS}, kill it now
@@ -284,7 +284,7 @@ class Baddie(LivingThing):
 		self._is_dying = True
 		self.image = pygame.image.load("images/actions/baddie_dying.png").convert_alpha()
 		
-	def update(self, refresh_time, bad_entities, camera, obstacles, player, on_die, on_game_over):	
+	def update(self, refresh_time, bad_entities, obstacles, player, on_die, on_game_over):	
 		"""Updates the baddie object based on the current given state"""
 		# Increment the the lifetime counter
 		self.lifetime += refresh_time
@@ -305,8 +305,7 @@ class Baddie(LivingThing):
 			return
 		
 		# If dying, don't move
-		# also don't move if the player is not arround
-		if self._is_dying or  not camera.can_see(self):
+		if self._is_dying:
 			return
 			
 		# Check if we ran into anything else. If so kill the first one created (the first one to see the others - me!)

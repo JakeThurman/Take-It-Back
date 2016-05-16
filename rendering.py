@@ -83,7 +83,7 @@ class Sprite(pygame.sprite.Sprite):
 	"""Base class for custom sprites classes
 	"""
 	
-	def __init__(self, x, y, file_name, use_alpha=False, grayscale=False):
+	def __init__(self, x, y, file_name, use_alpha=False):
 		"""C'tor
 		"""
 		# Init the parent class
@@ -91,7 +91,6 @@ class Sprite(pygame.sprite.Sprite):
 		
 		# Load the image
 		self._use_alpha = use_alpha
-		self._grayscale = grayscale
 		self._change_image(file_name)
 		
 		# Store positional information
@@ -105,10 +104,6 @@ class Sprite(pygame.sprite.Sprite):
 		# Update the image
 		unconverted_image = pygame.image.load(file_name)
 		self.image = unconverted_image.convert_alpha() if self._use_alpha else unconverted_image.convert()
-		
-		# Convert to grayscale if needed
-		if self._grayscale:
-			colors.to_grayscale(self.image)
 		
 		# Update the rect
 		self.rect = self.image.get_rect()
@@ -156,7 +151,7 @@ class Camera:
 			self.rect.centery = self.player.centery + self.pixes_to_adjust_by
 			self.rect.clamp_ip(self.world_rect)
 	
-	def _rel_rect(self, rect):
+	def convert_rect_for_render(self, rect):
 		"""Defines a rectangle positioned relitive to the camera position
 		"""
 		return pygame.Rect(rect.x-self.rect.x, rect.y-self.rect.y, rect.w, rect.h)
@@ -166,9 +161,12 @@ class Camera:
 		"""
 		return sprite.rect.colliderect(self.rect)
 		
-	def draw_sprites(self, sprites):
-		"""Draws all of the sprites, relitive to the camera
+	def get_all_that_can_see(self, sprite_group):
+		"""Returns all of the sprites the in a sprite_group that the camera can see
 		"""
-		for s in sprites:
+		visible = []
+		for s in sprite_group:
 			if self.can_see(s): # Only draw if they are in view.
-				self.sprite_renderer.render(s, convert_rect=self._rel_rect)
+				visible.append(s)
+				
+		return visible

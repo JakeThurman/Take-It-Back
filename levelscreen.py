@@ -22,8 +22,8 @@ class HealthBar:
 	# Constants
 	HEIGHT = 15
 	
-	def __init__(self, surface, screen_size, player):
-		self.shape_renderer = ShapeRenderer(surface)
+	def __init__(self, shape_renderer, screen_size, player):
+		self.shape_renderer = shape_renderer
 		self.player = player
 		self.screen_size = screen_size
 	
@@ -54,8 +54,8 @@ class HealthBar:
 class LevelRings:
 	"""Rendering class for the rings display for a level
 	"""
-	def __init__(self, surface):
-		self.sprite_renderer = SpriteRenderer(surface)
+	def __init__(self, sprite_renderer):
+		self.sprite_renderer = sprite_renderer
 		
 	def render(self, right, top, total_stars, stars):
 		for i in range(total_stars):
@@ -88,9 +88,10 @@ class LevelScreen(Screen):
 		self.camera = Camera(surface, self.my_level.player.rect, level_size[0], level_size[1], _settings.CAMERA_ADJUST_PIXELS)
 		
 		# Create dependencies and overlay renderers
+		self.sprite_renderer = SpriteRenderer(surface)
 		self.shape_renderer = ShapeRenderer(surface)
-		self.health_bar = HealthBar(surface, screen_size, self.my_level.player)
-		self.level_rings = LevelRings(surface)
+		self.health_bar = HealthBar(self.shape_renderer, screen_size, self.my_level.player)
+		self.level_rings = LevelRings(self.sprite_renderer)
 		
 		# Initialize key handling
 		self.up = self.down = self.left = self.right = False
@@ -144,29 +145,35 @@ class LevelScreen(Screen):
 		self.shape_renderer.render_rect((0, 0, self.screen_size[0], self.screen_size[1]), color=colors.SKY_BLUE)
 		
 		pygame.mouse.set_visible(False)	# Hide the mouse inside the game
-				
+		
 		# Update the player object based of the currently pressed keys	
 		self.my_level.player.update(self.up, self.down, self.left, self.right, self.my_level.obstacles)
+				
+		# Refresh the camera 
+		self.camera.update() # Update the camera position
 		
-		# Handle updating spawners
-		for attacker in self.my_level.attackers:
-			attacker.update(refresh_time, self.camera, self.my_level.player, self.my_level.obstacles, self._add_entity)
+		# Find the visible sprites
+		visible_sprites = self.camera.get_all_that_can_see(self.my_level.all_sprite)
+		visible_obstacles = [o for o in self.my_level.obstacles if o in visible_sprites]
+		
+		# Handle updating/rendering the visible sprites
+		for s in visible_sprites:
+			# Handle updating a spawner
+			if s in self.my_level.attackers:
+				s.update(refresh_time, self.my_level.player, visible_obstacles, self._add_entity)
 			
-		# Update any current enitities
-		for entity in self.entities:
-			entity.update(refresh_time, self.entities, self.camera, self.my_level.obstacles, self.my_level.player, lambda: self._on_entity_die(entity), lambda: self._on_lose_func())
+			# Handle updating a current enitity
+			if s in self.entities:
+				s.update(refresh_time, self.entities, visible_obstacles, self.my_level.player, lambda: self._on_entity_die(s), lambda: self._on_lose_func())
+			
+			# Render the sprite to the screen
+			self.sprite_renderer.render(s, convert_rect=self.camera.convert_rect_for_render)
 		
 		# Update other items
 		self.my_level.update_health_packs()
 		self.my_level.update_bonus_stars()
 		
-		# Update the camera position
-		self.camera.update()
-		
-		# Render all of the level's sprites
-		self.camera.draw_sprites(self.my_level.all_sprite)
-		
-		# Render the status bar - if there is any reason to show it
+		# Render the health bar - if there is any reason to show it
 		if len(self.my_level.attackers) != 0:
 			self.health_bar.render()
 		
