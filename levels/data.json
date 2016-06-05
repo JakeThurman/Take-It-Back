@@ -14,12 +14,12 @@
     "levels/default/level2.map": {
       "health": 20, 
       "total-rings": 6, 
-      "rings": 0
+      "rings": 6
     }, 
     "levels/difficult/quite-difficult.map": {
-      "health": 5, 
+      "rings": 4, 
       "total-rings": 6, 
-      "rings": 5
+      "health": 1.099999999999988
     }, 
     "levels/default/super-easy.map": {
       "health": 20, 
