@@ -165,8 +165,11 @@ class Camera:
 		"""Returns all of the sprites the in a sprite_group that the camera can see
 		"""
 		visible = []
+		invisible = []
 		for s in sprite_group:
 			if self.can_see(s): # Only draw if they are in view.
 				visible.append(s)
+			else:
+				invisible.append(s)
 				
-		return visible
+		return (visible, invisible)

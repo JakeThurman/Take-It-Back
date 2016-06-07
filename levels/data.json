@@ -17,9 +17,9 @@
       "rings": 6
     }, 
     "levels/difficult/quite-difficult.map": {
-      "rings": 4, 
+      "health": 7.599999999999999, 
       "total-rings": 6, 
-      "health": 1.099999999999988
+      "rings": 4
     }, 
     "levels/default/super-easy.map": {
       "health": 20, 
@@ -58,10 +58,10 @@
     "difficult"
   ], 
   "settings": {
-    "jump": "w", 
-    "right": "d", 
-    "crouch": "s", 
-    "left": "a"
+    "jump": 273, 
+    "right": 275, 
+    "crouch": 274, 
+    "left": 276
   }, 
   "unlocked": [
     "levels/default/level2.map", 

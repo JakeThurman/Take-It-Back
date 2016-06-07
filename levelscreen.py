@@ -2,10 +2,11 @@
 # Jacob Thurman
 # Side Scroller Game Screen
 
-import pygame, sys, colors, json, resources
+import pygame, sys, colors, json, resources, settingsmanager
 from rendering import *
 from screen import Screen
 from world import Level, Ring
+from settingsmanager import Keys
 from levelstatescreens import PauseMenuScreen
 from pygame.locals import *
 
@@ -101,13 +102,13 @@ class LevelScreen(Screen):
 	
 	# Handles pygame key change events
 	def _handle_key_change(self, key, value):
-		if key == K_UP or key == K_SPACE:
+		if key == settingsmanager.get_user_setting(Keys.SETTING_JUMP_KEY):
 			self.up = value
-		elif key == K_DOWN:
+		elif key == settingsmanager.get_user_setting(Keys.SETTING_CROUCH_KEY):
 			self.down = value
-		elif key == K_LEFT:
+		elif key == settingsmanager.get_user_setting(Keys.SETTING_LEFT_KEY):
 			self.left = value
-		elif key == K_RIGHT:
+		elif key == settingsmanager.get_user_setting(Keys.SETTING_RIGHT_KEY):
 			self.right = value
 	
 	# Handles key up events, and clears the stored value for any of the keys we were listening for
@@ -118,12 +119,12 @@ class LevelScreen(Screen):
 		if key == K_ESCAPE:
 			self._pause_game()
 	
-	def _pause_game(self):
-		self._screen_manager.set(lambda surface, screen_size, screen_manager: PauseMenuScreen(surface, screen_size, screen_manager, self.level_title, self._return_to_picker_func, self._restart_me_func))
-	
 	# Handles key down events, and stores a flag for any of the keys we are listening for
 	def handle_key_down(self, key):
 		self._handle_key_change(key, True)
+	
+	def _pause_game(self):
+		self._screen_manager.set(lambda surface, screen_size, screen_manager: PauseMenuScreen(surface, screen_size, screen_manager, self.level_title, self._return_to_picker_func, self._restart_me_func))
 	
 	def _add_entity(self, bullet):
 		self.my_level.all_sprite.add(bullet)
@@ -153,19 +154,23 @@ class LevelScreen(Screen):
 		self.camera.update() # Update the camera position
 		
 		# Find the visible sprites
-		visible_sprites = self.camera.get_all_that_can_see(self.my_level.all_sprite)
+		visible_sprites, invisible_sprites = self.camera.get_all_that_can_see(self.my_level.all_sprite)
 		visible_obstacles = [o for o in self.my_level.obstacles if o in visible_sprites]
 		
-		# Handle updating/rendering the visible sprites
+		# Handle updating a spawner
+		for s in self.my_level.attackers:
+			s.add_time(refresh_time)
+			if s in visible_sprites:
+				s.try_attack(self.my_level.player, visible_obstacles, self._add_entity)
+		
+		# Handle updating a current enitity
+		for s in self.entities:
+			s.add_time(refresh_time)
+			if s in visible_sprites:
+				s.update(self.entities, visible_obstacles, self.my_level.player, lambda: self._on_entity_die(s), lambda: self._on_lose_func())
+		
+		# Handle rendering the visible sprites
 		for s in visible_sprites:
-			# Handle updating a spawner
-			if s in self.my_level.attackers:
-				s.update(refresh_time, self.my_level.player, visible_obstacles, self._add_entity)
-			
-			# Handle updating a current enitity
-			if s in self.entities:
-				s.update(refresh_time, self.entities, visible_obstacles, self.my_level.player, lambda: self._on_entity_die(s), lambda: self._on_lose_func())
-			
 			# Render the sprite to the screen
 			self.sprite_renderer.render(s, convert_rect=self.camera.convert_rect_for_render)
 		

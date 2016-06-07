@@ -120,6 +120,8 @@ class PauseMenuScreen(Screen):
 		if self.return_to_level.is_hovered:
 			self.return_to_picker_screen_func()
 		elif self.restart.is_hovered:
+			self._screen_manager.go_back()
+			self._screen_manager.go_back()
 			self.restart_func()
 		elif self.quit_button.is_hovered:
 			pygame.quit()

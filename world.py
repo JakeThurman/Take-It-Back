@@ -98,10 +98,7 @@ class Weapon(Sprite):
 		# Say that we are halfway through our wait to fire initially.
 		self.last_fire_ticks = (self.min_fire_interval / 2)
 	
-	def update(self, refresh_time, player, obstacles, add_entity_func):
-		# Increment the wait counter with the time since the last update
-		self.last_fire_ticks += refresh_time
-		
+	def try_attack(self, player, obstacles, add_entity_func):		
 		# If we haven't waited long enough, we don't want to fire. Then, check 
 		# a randomly generated integer in the range [0, 5 * (10 - power/2)]; if
 		# that randomly returns 1, we want to fire
@@ -112,6 +109,11 @@ class Weapon(Sprite):
 			is_right = player.rect.center[0] > self.rect.center[0]
 			add_entity_func(Bullet(self.rect.right if is_right else self.rect.left, self.rect.center[1], is_right, self, self.power + 1))
 			self.last_fire_ticks = 0 # Reset the wait counter
+			
+	def add_time(self, refresh_time):
+		# Increment the wait counter with the time since the last update
+		self.last_fire_ticks += refresh_time
+		
 				
 class Spawner(Sprite):
 	"""
@@ -137,10 +139,7 @@ class Spawner(Sprite):
 	def _on_spawn_die(self, spawn):
 		self.spawn.remove(spawn)
 	
-	def update(self, refresh_time, player, obstacles, add_entity_func):	
-		# Increment the wait counter with the time since the last update
-		self.last_fire_ticks += refresh_time
-		
+	def try_attack(self, player, obstacles, add_entity_func):		
 		# If we haven't waited long enough, we don't want to fire, 
 		# and there isn't too many spawn, check a randomly 
 		# generated integer in the range [0, 60 * (10 - power)]; 
@@ -157,7 +156,10 @@ class Spawner(Sprite):
 			add_entity_func(my_spawn)
 			self.spawn.append(my_spawn)
 			self.last_fire_ticks = 0 # Reset the wait counter
-		
+			
+	def add_time(self, refresh_time):
+		# Increment the wait counter with the time since the last update
+		self.last_fire_ticks += refresh_time
 
 class Bullet(Sprite):	
 	"""
@@ -184,10 +186,11 @@ class Bullet(Sprite):
 		# Say that this bullet is old as dirt to kill it on the next frame.
 		self.lifetime += self.MAX_LIFETIME_MS
 	
-	# Upodates the bullet, 
-	def update(self, refresh_time, bad_entities, obstacles, player, on_die, on_game_over):
+	def add_time(self, refresh_time):
 		self.lifetime += refresh_time
-		
+	
+	# Updates the bullet, 
+	def update(self, bad_entities, obstacles, player, on_die, on_game_over):
 		# If this bullet has lasted for more than {MAX_LIFETIME_MS}, kill it now
 		if self.lifetime > self.MAX_LIFETIME_MS:
 			on_die()
@@ -284,12 +287,14 @@ class Baddie(LivingThing):
 		self._is_dying = True
 		self.image = pygame.image.load("images/actions/baddie_dying.png").convert_alpha()
 		
-	def update(self, refresh_time, bad_entities, obstacles, player, on_die, on_game_over):	
-		"""Updates the baddie object based on the current given state"""
+	def add_time(self, refresh_time):
 		# Increment the the lifetime counter
 		self.lifetime += refresh_time
 		if self._is_dying:
 			self.dead_for += refresh_time
+	
+	def update(self, bad_entities, obstacles, player, on_die, on_game_over):	
+		"""Updates the baddie object based on the current given state"""
 		
 		# Handle the end of the dealth cycle
 		# or if this baddie has lasted for more than {MAX_LIFETIME_MS}, despawn now
