@@ -57,7 +57,7 @@ class SettingsScreen(Screen):
 		i = 1
 		for key, title, value in settingsmanager.get_user_settings():
 			self.option_renderer.render(title, (40, i * 40), color=colors.SILVER, hover_color=colors.SILVER)
-			rend = self.option_renderer.render(str(value), (250, i * 40))
+			rend = self.option_renderer.render(pygame.key.name(value).title(), (250, i * 40))
 			i += 1
 			
 			# Store the rendered setting object again
