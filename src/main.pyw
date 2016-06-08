@@ -83,7 +83,7 @@ if __name__ == '__main__':
 	except SystemExit: # Don't log SystemExit exceptions (thrown by sys.exit())
 		pass
 	except KeyboardInterrupt: # Don't log KeyboardInterrupt exceptions (thrown by Ctrl+C from comand line)
-		pas
+		pass
 	except:	
 		# Log the exception to the log file
 		logging.exception("AT: " + datetime.datetime.now().isoformat())
