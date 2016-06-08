@@ -1,9 +1,0 @@
-{
-  "name":"Difficult Levels",
-  "levels":[
-    {
-      "name":"Quite Difficult",
-      "map":"quite-difficult.map"
-    }
-  ]
-}
