@@ -67,5 +67,5 @@ class SettingsScreen(Screen):
 		if self.edit_key != None:		
 			self.shape_renderer.render_rect((ss[0] / 4, ss[1] / 4, ss[0] - ss[0] / 4, ss[1] - ss[1] / 4), color=colors.WHITE)
 			
-			edit_text = "Press a key to use as the {0} key.".format(self.edit_key[2]) #TODO: Localize me
+			edit_text = resources.PRESS_TO_CHANGE_KEY.format(self.edit_key[2])
 			self.option_renderer.render(edit_text, (ss[0] / 4, ss[1] / 3), color=colors.BLACK, hover_color=colors.BLACK)
