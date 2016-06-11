@@ -7,6 +7,7 @@ Thanks!
 """
 
 import pygame, os, sys, resources, datetime, logging
+import globals as g
 from tkinter import messagebox
 from pygame.locals import *
 from launchscreen import LaunchScreen
@@ -17,7 +18,7 @@ def main():
 	pygame.init()
 	
 	# Set the game icon
-	pygame.display.set_icon(pygame.image.load("images/logo-icon.png"))
+	pygame.display.set_icon(pygame.image.load(g.ROOT_PATH + "images/logo-icon.png"))
 	
 	# Initialize the window
 	screen_size = (700, 500)

@@ -11,7 +11,7 @@ class Keys:
 	# The folder where levels are stored
 	LEVELS_PREFIX = "levels/"
 	# The path to the data file
-	JSON_DATA_FILE_NAME = os.path.expanduser('~')+"/AppData/Roaming/Take It Back/data.json"
+	JSON_DATA_FILE_PATH = os.path.expanduser('~')+"/AppData/Roaming/Take It Back/data.json"
 	# The name of a package
 	PACKAGE_JSON_FILE_NAME = "/package.json"
 
@@ -61,7 +61,7 @@ class Keys:
 	SETTING_RIGHT_KEY = "right"
 
 # Loads the JSON once. Effectivly a singleton because it is in the root of the module
-with open(Keys.JSON_DATA_FILE_NAME, "r") as data_file:    
+with open(Keys.JSON_DATA_FILE_PATH, "r") as data_file:    
 	_json_data = json.load(data_file)
 	
 def perform_update(action):
@@ -74,7 +74,7 @@ def perform_update(action):
 	# Run the update action and check the "made change" flag returned
 	if action(_json_data):
 		# Update the data file with new data
-		with open(Keys.JSON_DATA_FILE_NAME, 'w') as outfile:
+		with open(Keys.JSON_DATA_FILE_PATH, 'w') as outfile:
 			json.dump(_json_data, outfile, indent=2)
 			
 def use_json(func):

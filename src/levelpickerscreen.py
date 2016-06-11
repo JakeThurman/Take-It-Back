@@ -5,6 +5,7 @@
 """
 
 import pygame, sys, colors, json, resources, settingsmanager
+import globals as g
 from rendering import *
 from screen import Screen
 from pygame.locals import K_ESCAPE
@@ -25,16 +26,16 @@ class Consts:
 # screeen for failed and completed levels respectfully.
 class FailedIcon(Sprite):
 	def __init__(self, x, y):
-		super().__init__(x, y, "images/icons/x-mark.png", use_alpha=True)
+		super().__init__(x, y, g.ROOT_PATH + "images/icons/x-mark.png", use_alpha=True)
 
 class CompletedIcon(Sprite):
 	def __init__(self, x, y):
-		super().__init__(x, y, "images/icons/check.png", use_alpha=True)
+		super().__init__(x, y, g.ROOT_PATH + "images/icons/check.png", use_alpha=True)
 		
 # Sprite icon for locked levels.
 class LockedIcon(Sprite):
 	def __init__(self, x, y):
-		super().__init__(x, y, "images/icons/locked.png", use_alpha=True)
+		super().__init__(x, y, g.ROOT_PATH + "images/icons/locked.png", use_alpha=True)
 	
 # Helper class, for getting named valus for level links (and header)
 class LevelLine:
@@ -84,7 +85,7 @@ class LevelPickerScreen(Screen):
 		# Next, add each package
 		for level_package_path in packages:
 			# Open the package.json file for this folder
-			with open(Keys.LEVELS_PREFIX + level_package_path + Keys.PACKAGE_JSON_FILE_NAME) as level_package:
+			with open(g.ROOT_PATH + Keys.LEVELS_PREFIX + level_package_path + Keys.PACKAGE_JSON_FILE_NAME) as level_package:
 				# Load the package json
 				level_package_data = json.load(level_package)
 				
@@ -287,7 +288,7 @@ class LevelPickerScreen(Screen):
 			
 			# Finally, store the rendered elemenet for click handling
 			line.set_el(el)
-			
+		
 		# Render special links
 		self.back_button = self.sprite_renderer.render(BackIcon(self.screen_size[0] - self.screen_size[0]/8, self.screen_size[1]/8))
 		

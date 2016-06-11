@@ -1,4 +1,5 @@
 import pygame, sys, colors, resources
+import globals as g
 from pygame.locals import *
 from rendering import *
 from screen import Screen
@@ -6,7 +7,7 @@ from settingsscreen import SettingsScreen
 
 class Logo(Sprite):
 	def __init__(self, x, y):
-		super().__init__(x, y, "images/logo.png", use_alpha=True)
+		super().__init__(x, y, g.ROOT_PATH + "images/logo.png", use_alpha=True)
 
 class LaunchScreen(Screen):
 	"""Renderers the splash screen

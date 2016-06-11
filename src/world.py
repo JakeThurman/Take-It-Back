@@ -4,6 +4,7 @@
 
 import pygame, random
 from rendering import Sprite
+import globals as g
 
 class WallOpenDir:
 	# "Enum" constant values.
@@ -17,11 +18,11 @@ class WallOpenDir:
 	def get_file_name(dir):
 		# We start with a map object...
 		map = {
-			WallOpenDir.NONE: "images/world/wall.png",
-			WallOpenDir.LEFT_ONLY: "images/world/left_only.png",
-			WallOpenDir.RIGHT_ONLY: "images/world/right_only.png",
-			WallOpenDir.UP_ONLY: "images/world/up_only.png",
-			WallOpenDir.DOWN_ONLY: "images/world/down_only.png",
+			WallOpenDir.NONE: g.ROOT_PATH + "images/world/wall.png",
+			WallOpenDir.LEFT_ONLY: g.ROOT_PATH + "images/world/left_only.png",
+			WallOpenDir.RIGHT_ONLY: g.ROOT_PATH + "images/world/right_only.png",
+			WallOpenDir.UP_ONLY: g.ROOT_PATH + "images/world/up_only.png",
+			WallOpenDir.DOWN_ONLY: g.ROOT_PATH + "images/world/down_only.png",
 		}
 		# Then return the needed value.
 		return map[dir]
@@ -61,7 +62,7 @@ class WinBlock(Sprite):
 	"""
 	def __init__(self, x, y):
 		# Init the parent class
-		super().__init__(x, y, "images/world/win_block.png")
+		super().__init__(x, y, g.ROOT_PATH + "images/world/win_block.png")
 		
 class HealthPack(Sprite):
 	"""
@@ -70,7 +71,7 @@ class HealthPack(Sprite):
 	"""
 	def __init__(self, x, y):
 		# Init the parent class
-		super().__init__(x, y, "images/world/health_pack.png")
+		super().__init__(x, y, g.ROOT_PATH + "images/world/health_pack.png")
 		
 class Ring(Sprite):
 	"""
@@ -79,7 +80,7 @@ class Ring(Sprite):
 	"""
 	def __init__(self, x, y, grayscale=False):
 		# Init the parent class
-		super().__init__(x, y, "images/world/ring_grayscale.png" if grayscale else "images/world/ring.png", use_alpha=True)
+		super().__init__(x, y, g.ROOT_PATH + "images/world/ring_grayscale.png" if grayscale else g.ROOT_PATH + "images/world/ring.png", use_alpha=True)
 		
 class Weapon(Sprite):
 	"""
@@ -88,7 +89,7 @@ class Weapon(Sprite):
 	"""	
 	def __init__(self, x, y, power):
 		# Init the parent class
-		super().__init__(x, y, "images/world/weapon.png", use_alpha=True)
+		super().__init__(x, y, g.ROOT_PATH + "images/world/weapon.png", use_alpha=True)
 		# Don't let users pass through these blocks
 		self.dir = WallOpenDir.NONE
 		# Store the power
@@ -124,7 +125,7 @@ class Spawner(Sprite):
 	
 	def __init__(self, x, y, power):
 		# Init the parent class
-		super().__init__(x, y, "images/world/spawner.png", use_alpha=True)
+		super().__init__(x, y, g.ROOT_PATH + "images/world/spawner.png", use_alpha=True)
 		# Don't let users pass through these blocks
 		self.dir = WallOpenDir.NONE
 		# Store the power
@@ -174,7 +175,7 @@ class Bullet(Sprite):
 	# C'tor
 	def __init__(self, x, y, right, maker, power):
 		# Call the parent c'tor
-		super().__init__(x, y, "images/world/laser.png", use_alpha=True)
+		super().__init__(x, y, g.ROOT_PATH + "images/world/laser.png", use_alpha=True)
 		
 		# Store other info
 		self.direction_is_right = right
@@ -267,7 +268,7 @@ class Baddie(LivingThing):
 	def __init__(self, x, y, maker, power, before_death_func):		
 		"""Constructor"""
 		# Call the parent c'tor
-		super().__init__(x, y, "images/actions/baddie_idle.png", use_alpha=True)
+		super().__init__(x, y, g.ROOT_PATH + "images/actions/baddie_idle.png", use_alpha=True)
 		
 		# Initialize other locals
 		self.maker = maker
@@ -285,7 +286,7 @@ class Baddie(LivingThing):
 		
 	def _set_dying(self):
 		self._is_dying = True
-		self.image = pygame.image.load("images/actions/baddie_dying.png").convert_alpha()
+		self.image = pygame.image.load(g.ROOT_PATH + "images/actions/baddie_dying.png").convert_alpha()
 		
 	def add_time(self, refresh_time):
 		# Increment the the lifetime counter
@@ -364,14 +365,14 @@ class Player(LivingThing):
 	def __init__(self, x, y, initial_health):
 		# Store the names of all of the images
 		self._images =  { 
-			"run_left": "images/actions/run_left.png",
-			"run_right": "images/actions/run_right.png",
-			"idle_left": 'images/actions/idle_left.png',
-			"idle_right": 'images/actions/idle_right.png',
-			"jump_left": "images/actions/jump_left.png",
-			"jump_right": "images/actions/jump_right.png",
-			"down_left": "images/actions/down_left.png",
-			"down_right": "images/actions/down_right.png"
+			"run_left": g.ROOT_PATH + "images/actions/run_left.png",
+			"run_right": g.ROOT_PATH + "images/actions/run_right.png",
+			"idle_left": g.ROOT_PATH + 'images/actions/idle_left.png',
+			"idle_right": g.ROOT_PATH + 'images/actions/idle_right.png',
+			"jump_left": g.ROOT_PATH + "images/actions/jump_left.png",
+			"jump_right": g.ROOT_PATH + "images/actions/jump_right.png",
+			"down_left": g.ROOT_PATH + "images/actions/down_left.png",
+			"down_right": g.ROOT_PATH + "images/actions/down_right.png"
 		}
 		
 		# Call the parent c'tor
@@ -483,7 +484,7 @@ class Level(object):
 		self.stars = 0
 		
 		# Takes all of the lines from the level file and caches them
-		with open(level_file_name, "r") as level_file:
+		with open(g.ROOT_PATH + level_file_name, "r") as level_file:
 			self.level_lines = level_file.readlines()
 		
 	# Intializes from level from the level file
