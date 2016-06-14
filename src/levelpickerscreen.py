@@ -4,6 +4,7 @@
 
 """
 
+from __future__ import division # Floating point division for python 2
 import pygame, sys, colors, json, resources, settingsmanager
 import globals as g
 from rendering import *
@@ -26,16 +27,16 @@ class Consts:
 # screeen for failed and completed levels respectfully.
 class FailedIcon(Sprite):
 	def __init__(self, x, y):
-		super().__init__(x, y, g.ROOT_PATH + "images/icons/x-mark.png", use_alpha=True)
+		super(FailedIcon, self).__init__(x, y, g.ROOT_PATH + "images/icons/x-mark.png", use_alpha=True)
 
 class CompletedIcon(Sprite):
 	def __init__(self, x, y):
-		super().__init__(x, y, g.ROOT_PATH + "images/icons/check.png", use_alpha=True)
+		super(CompletedIcon, self).__init__(x, y, g.ROOT_PATH + "images/icons/check.png", use_alpha=True)
 		
 # Sprite icon for locked levels.
 class LockedIcon(Sprite):
 	def __init__(self, x, y):
-		super().__init__(x, y, g.ROOT_PATH + "images/icons/locked.png", use_alpha=True)
+		super(LockedIcon, self).__init__(x, y, g.ROOT_PATH + "images/icons/locked.png", use_alpha=True)
 	
 # Helper class, for getting named valus for level links (and header)
 class LevelLine:
@@ -60,7 +61,7 @@ class LevelPickerScreen(Screen):
 	def __init__(self, surface, screen_size, screen_manager):		
 		"""Constructor
 		"""
-		super().__init__()
+		super(LevelPickerScreen, self).__init__()
 	
 		# Create rendering dependencies
 		self.package_text_renderer = OptionRenderer(surface, pygame.font.Font(None, 40), do_hover=False)

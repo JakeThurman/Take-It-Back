@@ -8,7 +8,6 @@ Thanks!
 
 import pygame, os, sys, resources, datetime, logging
 import globals as g
-from tkinter import messagebox
 from pygame.locals import *
 from launchscreen import LaunchScreen
 from screen import ScreenManager
@@ -85,12 +84,19 @@ if __name__ == '__main__':
 		pass
 	except KeyboardInterrupt: # Don't log KeyboardInterrupt exceptions (thrown by Ctrl+C from comand line)
 		pass
-	except:	
+	except:
 		# Log the exception to the log file
 		logging.exception("AT: " + datetime.datetime.now().isoformat())
 		
 		# Exit pygame
 		pygame.quit()
+		
+		try: # for Python2
+			import Tkinter
+			import tkMessageBox as messagebox
+
+		except ImportError: # for Python3
+			from tkinter import messagebox
 		
 		# Alert the user that something bad happened
 		messagebox.showerror(resources.AN_EXCEPTION_OCCURED_TITLE, resources.AN_EXCEPTION_OCCURED)

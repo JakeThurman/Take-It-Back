@@ -5,7 +5,7 @@ Screen Helper Classes
 import pygame, sys
 from pygame.locals import K_ESCAPE
 
-class Screen:
+class Screen(object):
 	"""Handles and exposes common screen actions
 	"""
 	def __init__(self):
@@ -27,7 +27,7 @@ class Screen:
 			sys.exit()
 		
 	
-class SafeScreenManager:
+class SafeScreenManager(object):
 	"""Wrapper class for ScreenManager to give write only access to screens
 	"""
 	def __init__(self, screen_manager):
@@ -41,7 +41,7 @@ class SafeScreenManager:
 	def go_back(self):
 		self._screen_manager.go_back()
 		
-class ScreenManager:
+class ScreenManager(object):
 	"""Super simple helper to manage different screeens with common pass through methods.
 	"""
 	

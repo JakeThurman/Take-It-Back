@@ -4,7 +4,7 @@ Jacob Thurman
 
 import pygame, colors
 		
-class ShapeRenderer:
+class ShapeRenderer(object):
 	"""Renders simple shapes
 	"""
 	
@@ -29,13 +29,13 @@ class ShapeRenderer:
 			s.fill(color)                                # this fills the entire surface
 			self.surface.blit(s, (coords[0], coords[1])) # set the top-left coordinates
 
-class Option:
+class Option(object):
 	"""Minimal return data class
 	"""
 	def __init__(self, is_hovered):
 		self.is_hovered = is_hovered
 
-class OptionRenderer:
+class OptionRenderer(object):
 	"""Basically TextRenderer but this handles hovering automatically
 	"""
 	
@@ -87,7 +87,7 @@ class Sprite(pygame.sprite.Sprite):
 		"""C'tor
 		"""
 		# Init the parent class
-		super().__init__()
+		super(Sprite, self).__init__()
 		
 		# Load the image
 		self._use_alpha = use_alpha
@@ -111,7 +111,7 @@ class Sprite(pygame.sprite.Sprite):
 	def is_hovered(self):
 		return self.rect.collidepoint(pygame.mouse.get_pos())
 
-class SpriteRenderer:
+class SpriteRenderer(object):
 	"""Handlers rendering sprites
 	"""
 	def __init__(self, surface):
@@ -125,7 +125,7 @@ class SpriteRenderer:
 		self.surface.blit(sprite.image, sprite.rect if convert_rect == None else convert_rect(sprite.rect))
 		return sprite
 		
-class Camera:
+class Camera(object):
 	"""Class for centering the screen on the player
 	"""
 	def __init__(self, surface, player, level_width, level_height, pixes_to_adjust_by):

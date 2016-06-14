@@ -2,6 +2,7 @@
 	Defines Elements for the scroll game.
 """
 
+from __future__ import division # Floating point division for python 2
 import pygame, random
 from rendering import Sprite
 import globals as g
@@ -15,6 +16,7 @@ class WallOpenDir:
 	DOWN_ONLY = 4
 	
 	# Gets a file image from a wall direction
+	@staticmethod
 	def get_file_name(dir):
 		# We start with a map object...
 		map = {
@@ -30,6 +32,7 @@ class WallOpenDir:
 	_ALL_KEYS = ("X", "L", "R", "U", "D")
 		
 	# Returns a WallOpenDir value from a letter key
+	@staticmethod
 	def of(letter):
 		# Maps .map file characters to the appropriate direction...
 		map = {
@@ -50,7 +53,7 @@ class Wall(Sprite):
 	'''
 	def __init__(self, x, y, dir):
 		# Init the parent class
-		super().__init__(x, y, WallOpenDir.get_file_name(dir))
+		super(Wall, self).__init__(x, y, WallOpenDir.get_file_name(dir))
 
 		# Store size info about the sprite
 		self.dir = dir
@@ -62,7 +65,7 @@ class WinBlock(Sprite):
 	"""
 	def __init__(self, x, y):
 		# Init the parent class
-		super().__init__(x, y, g.ROOT_PATH + "images/world/win_block.png")
+		super(WinBlock, self).__init__(x, y, g.ROOT_PATH + "images/world/win_block.png")
 		
 class HealthPack(Sprite):
 	"""
@@ -71,7 +74,7 @@ class HealthPack(Sprite):
 	"""
 	def __init__(self, x, y):
 		# Init the parent class
-		super().__init__(x, y, g.ROOT_PATH + "images/world/health_pack.png")
+		super(HealthPack, self).__init__(x, y, g.ROOT_PATH + "images/world/health_pack.png")
 		
 class Ring(Sprite):
 	"""
@@ -80,7 +83,7 @@ class Ring(Sprite):
 	"""
 	def __init__(self, x, y, grayscale=False):
 		# Init the parent class
-		super().__init__(x, y, g.ROOT_PATH + "images/world/ring_grayscale.png" if grayscale else g.ROOT_PATH + "images/world/ring.png", use_alpha=True)
+		super(Ring, self).__init__(x, y, g.ROOT_PATH + "images/world/ring_grayscale.png" if grayscale else g.ROOT_PATH + "images/world/ring.png", use_alpha=True)
 		
 class Weapon(Sprite):
 	"""
@@ -89,7 +92,7 @@ class Weapon(Sprite):
 	"""	
 	def __init__(self, x, y, power):
 		# Init the parent class
-		super().__init__(x, y, g.ROOT_PATH + "images/world/weapon.png", use_alpha=True)
+		super(Weapon, self).__init__(x, y, g.ROOT_PATH + "images/world/weapon.png", use_alpha=True)
 		# Don't let users pass through these blocks
 		self.dir = WallOpenDir.NONE
 		# Store the power
@@ -125,7 +128,7 @@ class Spawner(Sprite):
 	
 	def __init__(self, x, y, power):
 		# Init the parent class
-		super().__init__(x, y, g.ROOT_PATH + "images/world/spawner.png", use_alpha=True)
+		super(Spawner, self).__init__(x, y, g.ROOT_PATH + "images/world/spawner.png", use_alpha=True)
 		# Don't let users pass through these blocks
 		self.dir = WallOpenDir.NONE
 		# Store the power
@@ -175,7 +178,7 @@ class Bullet(Sprite):
 	# C'tor
 	def __init__(self, x, y, right, maker, power):
 		# Call the parent c'tor
-		super().__init__(x, y, g.ROOT_PATH + "images/world/laser.png", use_alpha=True)
+		super(Bullet, self).__init__(x, y, g.ROOT_PATH + "images/world/laser.png", use_alpha=True)
 		
 		# Store other info
 		self.direction_is_right = right
@@ -223,7 +226,7 @@ class Bullet(Sprite):
 				
 class LivingThing(Sprite):
 	def __init__(self, x, y, image, **kwargs):
-		super().__init__(x, y, image, **kwargs)
+		super(LivingThing, self).__init__(x, y, image, **kwargs)
 		
 		# Initialize movement locals
 		self.movy = 0
@@ -268,7 +271,7 @@ class Baddie(LivingThing):
 	def __init__(self, x, y, maker, power, before_death_func):		
 		"""Constructor"""
 		# Call the parent c'tor
-		super().__init__(x, y, g.ROOT_PATH + "images/actions/baddie_idle.png", use_alpha=True)
+		super(Baddie, self).__init__(x, y, g.ROOT_PATH + "images/actions/baddie_idle.png", use_alpha=True)
 		
 		# Initialize other locals
 		self.maker = maker
@@ -376,7 +379,7 @@ class Player(LivingThing):
 		}
 		
 		# Call the parent c'tor
-		super().__init__(x, y, self._images["idle_right"], use_alpha=True)
+		super(Player, self).__init__(x, y, self._images["idle_right"], use_alpha=True)
 
 		# Store information this sprite's size.
 		self.rect = self.image.get_rect()

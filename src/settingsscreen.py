@@ -1,3 +1,6 @@
+"""Manages the screen used for viewing/editing user settings
+"""
+from __future__ import division # Floating point division for python 2
 import colors, resources, settingsmanager
 from rendering import *
 from screen import Screen

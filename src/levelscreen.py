@@ -2,6 +2,7 @@
 # Jacob Thurman
 # Side Scroller Game Screen
 
+from __future__ import division # Floating point division for python 2
 import pygame, sys, colors, json, resources, settingsmanager
 from rendering import *
 from screen import Screen
@@ -69,7 +70,7 @@ class LevelScreen(Screen):
 	# Constructor
 	# NOTE: This c'tor is not a legal Screen.ScreenManger factory
 	def __init__(self, surface, screen_size, screen_manager, level_title, level_file, player_health, win_func, lose_func, return_to_picker_func, restart_me_func):	
-		super().__init__()	
+		super(LevelScreen, self).__init__()	
 		
 		# Store the passed in values (we don't surface as a global)
 		self.screen_size = screen_size

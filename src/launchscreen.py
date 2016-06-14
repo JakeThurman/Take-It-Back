@@ -1,3 +1,6 @@
+"""Manages the screen shown at launch.
+"""
+from __future__ import division # Floating point division for python 2
 import pygame, sys, colors, resources
 import globals as g
 from pygame.locals import *
@@ -7,7 +10,7 @@ from settingsscreen import SettingsScreen
 
 class Logo(Sprite):
 	def __init__(self, x, y):
-		super().__init__(x, y, g.ROOT_PATH + "images/logo.png", use_alpha=True)
+		super(Logo, self).__init__(x, y, g.ROOT_PATH + "images/logo.png", use_alpha=True)
 
 class LaunchScreen(Screen):
 	"""Renderers the splash screen
@@ -17,7 +20,7 @@ class LaunchScreen(Screen):
 		"""Constructor
 		"""
 		# init parent class
-		super().__init__()
+		super(LaunchScreen, self).__init__()
 		
 		# Create dependencies
 		self.shape_renderer = ShapeRenderer(surface)

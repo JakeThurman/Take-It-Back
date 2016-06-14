@@ -1,6 +1,7 @@
 """This file contains screens that exist to display state to the player
 """
 
+from __future__ import division # Floating point division for python 2
 import pygame, sys, colors, resources
 from rendering import *
 from screen import Screen
@@ -15,7 +16,7 @@ class EndGameScreen(Screen):
 		"""Constructor
 		"""
 	
-		super().__init__()
+		super(EndGameScreen, self).__init__()
 		
 		# Create Depndencies
 		self.option_renderer = OptionRenderer(surface, pygame.font.SysFont("monospace", 30))
@@ -83,13 +84,13 @@ class GameWonScreen(EndGameScreen):
 	"""Win specific overload of the EndGameScreen
 	"""
 	def __init__(self, surface, screen_size, screen_manager, play_again_func, completion_percentage):
-		super().__init__(surface, screen_size, screen_manager, True, play_again_func, completion_percentage=completion_percentage)
+		super(GameWonScreen, self).__init__(surface, screen_size, screen_manager, True, play_again_func, completion_percentage=completion_percentage)
 	
 class GameLostScreen(EndGameScreen):
 	"""Loss specific overload of the EndGameScreen
 	"""
 	def __init__(self, surface, screen_size, screen_manager, play_again_func):
-		super().__init__(surface, screen_size, screen_manager, False, play_again_func)
+		super(GameLostScreen, self).__init__(surface, screen_size, screen_manager, False, play_again_func)
 
 class PauseMenuScreen(Screen):
 	"""A level is paused. Give the user the option to quit, restart etc.
@@ -98,7 +99,7 @@ class PauseMenuScreen(Screen):
 	def __init__(self, surface, screen_size, screen_manager, level_name, return_to_picker_screen_func, restart_func):
 		"""Constructor
 		"""
-		super().__init__()
+		super(PauseMenuScreen, self).__init__()
 		
 		# Create Depndencies
 		self.option_renderer = OptionRenderer(surface, pygame.font.SysFont("monospace", 30))
