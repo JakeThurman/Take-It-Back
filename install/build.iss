@@ -1,28 +1,37 @@
 ; Define the Entry Poins
+
+#define AppName "Take It Back"
+#define DevName "Jake Thurman"
+
 [Files]
 Source: "..\src\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "dependencies\*"; DestDir: "{tmp}"; Flags: ignoreversion
-Source: "appdata\*"; DestDir: "{userappdata}/Take It Back"; Flags: ignoreversion
+Source: "dependencies\*"; DestDir: "{tmp}"; Flags: ignoreversion deleteafterinstall
+Source: "appdata\*"; DestDir: "{userappdata}/{#AppName}"; Flags: ignoreversion
 
 ; Settings
 [Setup]
 SetupIconFile="..\src\images\logo.ico"
-AppName="Take It Back"
-AppVerName="Take It Back"
+AppName={#AppName}
+AppVerName={#AppName}
 AppVersion="1.0.0.12"
-DefaultDirName="C:\Program Files\Jake Thurman\Take It Back"
+DefaultDirName="C:\Program Files\{#DevName}\{#AppName}"
 AppPublisherURL="jakethurman.github.io"
-AppPublisher="Jake Thurman"
-DefaultGroupName="Jake Thurman"
+AppPublisher="{#DevName}"
+DefaultGroupName="{#DevName}"
+OutputBaseFilename="{#AppName} Installer"
 
 ; Install Python 3.2
-[Run] 
-Filename: "msiexec.exe"; Parameters: "/i ""{tmp}\python-3.2.5.msi";
+[Run]                                                                       
+Filename: "msiexec.exe"; Parameters: "/i ""{tmp}\python-3.2.5.msi"; Flags: hidewizard; StatusMsg:"Installing Python Interpreter";
 
 ; Install Pygame
 [Run]
-Filename: "msiexec.exe"; Parameters: "/i ""{tmp}\pygame-1.9.2a0.win32-py3.2.msi";
+Filename: "msiexec.exe"; Parameters: "/i ""{tmp}\pygame-1.9.2a0.win32-py3.2.msi"; Flags: hidewizard; StatusMsg:"Installing Pygame Framework";
 
 ; Create a start menu shorcut
 [Icons]
-Name: "{group}\Take It Back"; Filename: "{app}\main.pyw"; IconFilename: "{app}\images\logo.ico"
+Name: "{group}\{#AppName}"; Filename: "{app}\main.pyw"; IconFilename: "{app}\images\logo.ico"
+
+; Run the game when the user has completed the install process.
+[Run]
+Filename: "python"; Parameters:"{app}\main.pyw"" > {userappdata}\run.log"; Flags: postinstall; Description: "Play Now!";
