@@ -1,11 +1,16 @@
-; Define the Entry Poins
+; This file generates the installer for {#AppName}
+; This game was created and published by {#DevName}
+
+#expr Exec("C:\Python27\python.exe", "../src/setup.py build",'.',1,SW_HIDE)
 
 #define AppName "Take It Back"
 #define DevName "Jake Thurman"
 
+; Define the Entry Points
 [Files]
-Source: "..\src\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "dependencies\*"; DestDir: "{tmp}"; Flags: ignoreversion deleteafterinstall
+Source: "build\exe.win32-2.7\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs      
+Source: "..\src\images\*"; DestDir: "{app}\images"; Flags: ignoreversion recursesubdirs createallsubdirs                    
+Source: "..\src\fonts\*"; DestDir: "{app}\fonts"; Flags: ignoreversion
 Source: "appdata\*"; DestDir: "{userappdata}/{#AppName}"; Flags: ignoreversion
 
 ; Settings
@@ -20,18 +25,10 @@ AppPublisher="{#DevName}"
 DefaultGroupName="{#DevName}"
 OutputBaseFilename="{#AppName} Installer"
 
-; Install Python 3.2
-[Run]                                                                       
-Filename: "msiexec.exe"; Parameters: "/i ""{tmp}\python-3.2.5.msi"; Flags: hidewizard; StatusMsg:"Installing Python Interpreter";
-
-; Install Pygame
-[Run]
-Filename: "msiexec.exe"; Parameters: "/i ""{tmp}\pygame-1.9.2a0.win32-py3.2.msi"; Flags: hidewizard; StatusMsg:"Installing Pygame Framework";
-
 ; Create a start menu shorcut
 [Icons]
-Name: "{group}\{#AppName}"; Filename: "{app}\main.pyw"; IconFilename: "{app}\images\logo.ico"
+Name: "{group}\{#AppName}"; Filename: "{app}\TakeItBack.exe"; IconFilename: "{app}\src\images\logo.ico"
 
 ; Run the game when the user has completed the install process.
 [Run]
-Filename: "python"; Parameters:"{app}\main.pyw"" > {userappdata}\run.log"; Flags: postinstall; Description: "Play Now!";
+Filename: "{app}\TakeItBack.exe"; Flags: postinstall; Description: "Play Now!";
