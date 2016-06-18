@@ -17,6 +17,5 @@ Project TODOs/Ideas:
 		- Fix camera jerking by adding "Camera Slack"
 	
 	- Requirements:
-		- Stop relying on System fonts.
 		- Create more levels.
 		- Make level picker screen scroll so you >~10 levels
