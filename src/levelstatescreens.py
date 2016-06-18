@@ -2,7 +2,7 @@
 """
 
 from __future__ import division # Floating point division for python 2
-import pygame, sys, colors, resources
+import pygame, sys, colors, resources, fonts
 from rendering import *
 from screen import Screen
 from settingsscreen import SettingsScreen
@@ -19,7 +19,7 @@ class EndGameScreen(Screen):
 		super(EndGameScreen, self).__init__()
 		
 		# Create Depndencies
-		self.option_renderer = OptionRenderer(surface, pygame.font.SysFont("monospace", 30))
+		self.option_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=30))
 		self.shape_renderer = ShapeRenderer(surface)
 		
 		# Store settings and callbacks
@@ -102,7 +102,7 @@ class PauseMenuScreen(Screen):
 		super(PauseMenuScreen, self).__init__()
 		
 		# Create Depndencies
-		self.option_renderer = OptionRenderer(surface, pygame.font.SysFont("monospace", 30))
+		self.option_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=30))
 		self.shape_renderer = ShapeRenderer(surface)
 		
 		# Store settings and callbacks

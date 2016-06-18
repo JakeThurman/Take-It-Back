@@ -1,7 +1,7 @@
 """Manages the screen used for viewing/editing user settings
 """
 from __future__ import division # Floating point division for python 2
-import colors, resources, settingsmanager
+import colors, resources, settingsmanager, fonts
 from rendering import *
 from screen import Screen
 from pygame.locals import *
@@ -20,7 +20,7 @@ class SettingsScreen(Screen):
 		
 		# Create dependencies
 		self.sprite_renderer = SpriteRenderer(surface)
-		self.option_renderer = OptionRenderer(surface, pygame.font.SysFont("monospace", 30))
+		self.option_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=30))
 		self.shape_renderer = ShapeRenderer(surface)
 		
 		self.edit_key = None

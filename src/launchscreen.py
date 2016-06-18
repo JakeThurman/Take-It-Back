@@ -1,7 +1,7 @@
 """Manages the screen shown at launch.
 """
 from __future__ import division # Floating point division for python 2
-import pygame, sys, colors, resources
+import pygame, sys, colors, resources, fonts
 import globals as g
 from pygame.locals import *
 from rendering import *
@@ -25,7 +25,7 @@ class LaunchScreen(Screen):
 		# Create dependencies
 		self.shape_renderer = ShapeRenderer(surface)
 		self.sprite_renderer = SpriteRenderer(surface)
-		self.option_renderer = OptionRenderer(surface, pygame.font.SysFont("monospace", 25))
+		self.option_renderer = OptionRenderer(surface, fonts.OPEN_SANS())
 		
 		# Store settings
 		self.screen_size = screen_size

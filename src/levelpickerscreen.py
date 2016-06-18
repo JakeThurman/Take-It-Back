@@ -5,7 +5,7 @@
 """
 
 from __future__ import division # Floating point division for python 2
-import pygame, sys, colors, json, resources, settingsmanager
+import pygame, sys, colors, json, resources, settingsmanager, fonts
 import globals as g
 from rendering import *
 from screen import Screen
@@ -54,9 +54,6 @@ class LevelLine:
 	
 class LevelPickerScreen(Screen):
 	"""Handles picking a side scroller game"""
-
-	# Constants 
-	LINK_TEXT_SIZE = 25
 	
 	def __init__(self, surface, screen_size, screen_manager):		
 		"""Constructor
@@ -64,9 +61,9 @@ class LevelPickerScreen(Screen):
 		super(LevelPickerScreen, self).__init__()
 	
 		# Create rendering dependencies
-		self.package_text_renderer = OptionRenderer(surface, pygame.font.Font(None, 40), do_hover=False)
-		self.level_text_renderer = OptionRenderer(surface, pygame.font.SysFont("monospace", 25))
-		self.link_text_renderer = OptionRenderer(surface, pygame.font.SysFont("monospace", self.LINK_TEXT_SIZE))
+		self.package_text_renderer = OptionRenderer(surface, fonts.KELMSCOT(size=31), do_hover=False)
+		self.level_text_renderer = OptionRenderer(surface, fonts.COURIER_PRIME_SANS())
+		self.link_text_renderer = OptionRenderer(surface, fonts.OPEN_SANS())
 		self.shape_renderer = ShapeRenderer(surface)
 		self.sprite_renderer = SpriteRenderer(surface)
 		
@@ -252,7 +249,7 @@ class LevelPickerScreen(Screen):
 		
 		# Render each line
 		for i, line in enumerate(self.level_lines):
-			el_pos = (INNER_LEFT if line.is_header else OUTER_LEFT, i * LINE_HEIGHT)
+			el_pos = (INNER_LEFT if line.is_header else OUTER_LEFT, LINE_HEIGHT * (i - 0.25) if line.is_header else i * LINE_HEIGHT)
 			
 			# Render the line appropriately
 			if line.is_header:
@@ -293,5 +290,5 @@ class LevelPickerScreen(Screen):
 		# Render special links
 		self.back_button = self.sprite_renderer.render(BackIcon(self.screen_size[0] - self.screen_size[0]/8, self.screen_size[1]/8))
 		
-		quit_pos = (self.screen_size[0] - self.LINK_TEXT_SIZE * 4, self.screen_size[1] - self.LINK_TEXT_SIZE * 2)
+		quit_pos = (self.screen_size[0] - fonts.LINK_TEXT_SIZE * 4, self.screen_size[1] - fonts.LINK_TEXT_SIZE * 2)
 		self.quit_button = self.link_text_renderer.render(resources.QUIT_GAME, quit_pos, color=colors.LIGHT_GRAY, hover_color=colors.SILVER)
