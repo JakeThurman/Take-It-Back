@@ -8,6 +8,8 @@ Thanks!
 
 import pygame, os, sys, resources, datetime, logging
 import globals as g
+#http://stackoverflow.com/questions/15595224/cx-freeze-wont-work-with-pygame-already-tried-import-pygame-view
+import re # Required for support of cx_freeze for exe generation 
 from pygame.locals import *
 from launchscreen import LaunchScreen
 from screen import ScreenManager

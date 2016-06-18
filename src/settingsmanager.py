@@ -2,6 +2,7 @@
 """
 
 import os, json, resources
+import globals as g
 
 class Keys:
 	"""JSON data file keys constants needed by the game
@@ -11,7 +12,7 @@ class Keys:
 	# The folder where levels are stored
 	LEVELS_PREFIX = "levels/"
 	# The path to the data file
-	JSON_DATA_FILE_PATH = os.path.expanduser('~')+"/AppData/Roaming/Take It Back/data.json"
+	JSON_DATA_FILE_PATH = g.APP_DATA_PATH + "/data.json"
 	# The name of a package
 	PACKAGE_JSON_FILE_NAME = "/package.json"
 

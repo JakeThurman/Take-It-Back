@@ -487,7 +487,7 @@ class Level(object):
 		self.stars = 0
 		
 		# Takes all of the lines from the level file and caches them
-		with open(g.ROOT_PATH + level_file_name, "r") as level_file:
+		with open(g.APP_DATA_PATH + level_file_name, "r") as level_file:
 			self.level_lines = level_file.readlines()
 		
 	# Intializes from level from the level file

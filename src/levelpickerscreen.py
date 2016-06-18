@@ -86,7 +86,7 @@ class LevelPickerScreen(Screen):
 		# Next, add each package
 		for level_package_path in packages:
 			# Open the package.json file for this folder
-			with open(g.ROOT_PATH + Keys.LEVELS_PREFIX + level_package_path + Keys.PACKAGE_JSON_FILE_NAME) as level_package:
+			with open(g.APP_DATA_PATH + Keys.LEVELS_PREFIX + level_package_path + Keys.PACKAGE_JSON_FILE_NAME) as level_package:
 				# Load the package json
 				level_package_data = json.load(level_package)
 				
