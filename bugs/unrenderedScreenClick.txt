@@ -1,0 +1,40 @@
+BUG DESC:
+	Click handlers don't handle the case of the screen not yet being rendered.
+	
+REPRODUCTION STEPS:
+	1: Navigate to a different screen. (any to any with a link)
+	2: Before the next rendering cycle occurs. (really quickly!) click again!
+	n: { Repeat until app crashes. }
+	
+STATUS:
+	Live!
+
+REPORT 1:
+	User: Jake
+	Timestamp: 2016-06-14T22:50:29.377000
+	
+	Traceback (most recent call last):
+	  File "C:\Users\Jake\TakeItBack\src\main.pyw", line 84, in <module>
+		main()
+	  File "C:\Users\Jake\TakeItBack\src\main.pyw", line 54, in main
+		manager.handle_click()
+	  File "C:\Users\Jake\TakeItBack\src\screen.py", line 84, in handle_click
+		self.curr.handle_click()
+	  File "C:\Users\Jake\TakeItBack\src\launchscreen.py", line 38, in handle_click
+		if self.choose_level_bttn.is_hovered:
+	AttributeError: 'LaunchScreen' object has no attribute 'choose_level_bttn'
+
+REPORT 2:
+	User: Jake
+	Timestamp: 2016-06-14T22:51:17.577000
+	
+	Traceback (most recent call last):
+	  File "C:\Users\Jake\TakeItBack\src\main.pyw", line 84, in <module>
+		main()
+	  File "C:\Users\Jake\TakeItBack\src\main.pyw", line 54, in main
+		manager.handle_click()
+	  File "C:\Users\Jake\TakeItBack\src\screen.py", line 84, in handle_click
+		self.curr.handle_click()
+	  File "C:\Users\Jake\TakeItBack\src\levelstatescreens.py", line 121, in handle_click
+		if self.return_to_level.is_hovered:
+	AttributeError: 'PauseMenuScreen' object has no attribute 'return_to_level'
