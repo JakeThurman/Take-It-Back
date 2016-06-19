@@ -9,9 +9,9 @@
   ], 
   "settings": {
     "jump": 273, 
-    "right": 275, 
+    "left": 276,
     "crouch": 274, 
-    "left": 276
+    "right": 275
   }, 
   "unlocked": [
   ]
