@@ -14,7 +14,8 @@ setup(
 		Executable(
 			script=g.ROOT_PATH + "main.pyw",
 			base="Win32GUI",
-			targetName=exe_file_name
+			targetName=exe_file_name,
+			icon=g.ROOT_PATH + "images/logo.ico"
 		)
 	]
 ) 
