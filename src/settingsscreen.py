@@ -1,7 +1,7 @@
 """Manages the screen used for viewing/editing user settings
 """
 from __future__ import division # Floating point division for python 2
-import colors, resources, settingsmanager, fonts
+import colors, resources, settingsmanager, fonts, textwrapping
 from rendering import *
 from screen import Screen
 from pygame.locals import *
@@ -20,7 +20,9 @@ class SettingsScreen(Screen):
 		
 		# Create dependencies
 		self.sprite_renderer = SpriteRenderer(surface)
-		self.option_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=30))
+		self._font_size = 30
+		self._font = fonts.OPEN_SANS(size=self._font_size)
+		self.option_renderer = OptionRenderer(surface, self._font)
 		self.shape_renderer = ShapeRenderer(surface)
 		
 		self.edit_key = None
@@ -70,5 +72,7 @@ class SettingsScreen(Screen):
 		if self.edit_key != None:		
 			self.shape_renderer.render_rect((ss[0] / 6, ss[1] / 6, ss[0] - ss[0] / 3, ss[1] - ss[1] / 3), color=colors.WHITE)
 			
-			edit_text = resources.PRESS_TO_CHANGE_KEY.format(self.edit_key[2])
-			self.option_renderer.render(edit_text, (ss[0] / 4, ss[1] / 3), color=colors.BLACK, hover_color=colors.BLACK)
+			edit_text = textwrapping.wrapline(resources.PRESS_TO_CHANGE_KEY.format(self.edit_key[2]), self._font, ss[0] - ss[0] / 2)
+			for i, line in enumerate(edit_text):
+				self.option_renderer.render(line, (ss[0] / 4, ss[1] / 3 + (i - 1) * (self._font_size * 1.5)), color=colors.BLACK, hover_color=colors.BLACK)
+
