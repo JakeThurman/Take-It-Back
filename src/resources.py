@@ -8,6 +8,9 @@ QUIT_GAME = "Exit"
 CHOOSE_A_LEVEL = "Choose a Level"
 SETTINGS = "Settings"
 
+# Level Picker Screen
+NEXT_LEVEL_PAGE = "More..."
+
 # End Game Screen/Pause Menu Screen
 YOU_WON = "Congratulations, You won!"
 YOU_LOST = "Better luck next time..."

@@ -52,17 +52,23 @@ class LevelLine:
 	def set_el(self, el):
 		self.el = el
 	
+
+# line-sizing constants
+INNER_LEFT = 30
+OUTER_LEFT = 65
+LINE_HEIGHT = 30
+	
 class LevelPickerScreen(Screen):
 	"""Handles picking a side scroller game"""
 	
-	def __init__(self, surface, screen_size, screen_manager):		
+	def __init__(self, surface, screen_size, screen_manager, page=0, _cached_level_lines=None):		
 		"""Constructor
 		"""
 		super(LevelPickerScreen, self).__init__()
 	
 		# Create rendering dependencies
-		self.package_text_renderer = OptionRenderer(surface, fonts.KELMSCOT(size=31), do_hover=False)
-		self.level_text_renderer = OptionRenderer(surface, fonts.COURIER_PRIME_SANS())
+		self.package_text_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=31), do_hover=False)
+		self.level_text_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=25))
 		self.link_text_renderer = OptionRenderer(surface, fonts.OPEN_SANS())
 		self.shape_renderer = ShapeRenderer(surface)
 		self.sprite_renderer = SpriteRenderer(surface)
@@ -70,15 +76,19 @@ class LevelPickerScreen(Screen):
 		# Store passed in values as needed
 		self._screen_manager = screen_manager
 		self.screen_size = screen_size
+		self._page = page
 		
 		# Initialize the levels and there titles by scanning the data 
 		# file and going in and loading all of the package members
-		settingsmanager.use_json(lambda json: self._load_packages(json[Keys.PACKAGES_KEY]))
+		if _cached_level_lines == None:
+			self.level_lines = settingsmanager.use_json(lambda json: self._load_packages(json[Keys.PACKAGES_KEY]))
+		else:
+			self.level_lines = _cached_level_lines	
 	
 	def _load_packages(self, packages):
 		# Here are all the lines for the levels.
 		# This includes levels and headers
-		self.level_lines = []
+		level_lines = []
 	
 		# Next, add each package
 		for level_package_path in packages:
@@ -87,9 +97,7 @@ class LevelPickerScreen(Screen):
 				# Load the package json
 				level_package_data = json.load(level_package)
 				
-				# Create a line for the package header and a blank one for spacing
-				self.level_lines.append(LevelLine("", is_header = True))
-				self.level_lines.append(LevelLine(level_package_data[Keys.PACKAGE_NAME_KEY], is_header = True))
+				level_lines.append(LevelLine(level_package_data[Keys.PACKAGE_NAME_KEY], is_header = True))
 				
 				# Now create a line for each actual level.
 				for level_data in level_package_data[Keys.PACKAGE_LEVELS_KEY]:
@@ -108,8 +116,10 @@ class LevelPickerScreen(Screen):
 						unlocks.append(Keys.LEVELS_PREFIX + level_package_path + "/" + map_file)
 					
 					# Add a line for the level name
-					self.level_lines.append(LevelLine(level_data[Keys.LEVEL_NAME_KEY], file_path=file_path, player_health=player_health, locked=locked, unlocks=unlocks))
+					level_lines.append(LevelLine(level_data[Keys.LEVEL_NAME_KEY], file_path=file_path, player_health=player_health, locked=locked, unlocks=unlocks))
 	
+		return level_lines
+
 	def handle_key_up(self, key):
 		# Escape should mean return to the launch screen
 		if key == K_ESCAPE:
@@ -120,19 +130,17 @@ class LevelPickerScreen(Screen):
 	
 	def handle_click(self):			
 		# Check special links first
-		if self.quit_button.is_hovered:
-			pygame.quit()
-			sys.exit()
+		if self.next_button != None and self.next_button.is_hovered:
+			self._screen_manager.set(lambda *a: LevelPickerScreen(*a, page=self._page + 1, _cached_level_lines=self.level_lines))
 			return # We've done what we needed to
 		elif self.back_button.is_hovered():
-			# We don't actually want to go "back",
-			# we wan to go back to the launch screen that created us
-			self._go_to_launch_screen()
+			self._screen_manager.go_back()
+			return
 		
 		unlocked_levels = settingsmanager.use_json(lambda json: json[Keys.UNLOCKED_LEVELS_KEY])
-	
+		
 		# Find the valid element that is at that position
-		clicked = [ll for ll in self.level_lines if not ll.is_header and ll.el.is_hovered and (not ll.locked or ll.file_path in unlocked_levels)]
+		clicked = [ll for ll in self._get_lines_for_page() if not ll.is_header and ll.el.is_hovered and (not ll.locked or ll.file_path in unlocked_levels)]
 		
 		# If the user didn't click on anything, don't do anything
 		if len(clicked) != 1:
@@ -165,6 +173,7 @@ class LevelPickerScreen(Screen):
 		
 	def _go_to_me(self):
 		# Set the screen to this object
+		self._page = 0 # Reset the page state
 		self._screen_manager.set(lambda *args: self)
 		
 	def _on_level_won(self, data, total_rings, my_rings, my_health):
@@ -231,25 +240,47 @@ class LevelPickerScreen(Screen):
 		# The completeion percentage is the average of the two percentages
 		return int((ring_percentage + health_percentage)/2)
 		
+	def _get_lines_for_page(self):
+		lines_per_page = (self.screen_size[1] / LINE_HEIGHT) - 1
+		
+		min = (self._page) * lines_per_page
+		max = (self._page + 1) * lines_per_page
+	
+		self._is_last_page = False
+		headers_so_far = 0
+		
+		for i, line in enumerate(self.level_lines):
+			if line.is_header:
+				headers_so_far += 1
+		
+			if (i + headers_so_far) >= max: break # We're done!
+			if (i + headers_so_far) < min:	continue # Not there yet...
+				
+			if line.is_header:
+				# Return a blank line for sizing
+				yield LevelLine("", is_header=True)
+			
+			# Return the actual line
+			yield line
+			
+			if i == len(self.level_lines): 
+				self._is_last_page = True
+
+		
 	def render(self, refresh_time):
 		# Set the backgroud color
 		self.shape_renderer.render_rect((0, 0, self.screen_size[0], self.screen_size[1]), color=colors.DARK_GRAY)
 		
 		# Show the mouse on the levels screen
 		pygame.mouse.set_visible(True)
-		
-		# line-sizing constants
-		INNER_LEFT = 30
-		OUTER_LEFT = 65
-		LINE_HEIGHT = 30
-		
+			
 		unlocked = settingsmanager.use_json(lambda json: json[Keys.UNLOCKED_LEVELS_KEY])
 		completed = settingsmanager.use_json(lambda json: json[Keys.COMPLETED_LEVELS_KEY])
 		failed = settingsmanager.use_json(lambda json: json[Keys.FAILED_LEVELS_KEY])
 		
 		# Render each line
-		for i, line in enumerate(self.level_lines):
-			el_pos = (INNER_LEFT if line.is_header else OUTER_LEFT, LINE_HEIGHT * (i - 0.25) if line.is_header else i * LINE_HEIGHT)
+		for i, line in enumerate(self._get_lines_for_page()):
+			el_pos = (INNER_LEFT if line.is_header else OUTER_LEFT, LINE_HEIGHT * (i - (0.5 if line.is_header else 0.25)))
 			
 			# Render the line appropriately
 			if line.is_header:
@@ -260,7 +291,7 @@ class LevelPickerScreen(Screen):
 				el = self.level_text_renderer.render(line.name, el_pos, color=colors.MID_GRAY, hover_color=colors.MID_GRAY)
 			
 				# Render a Lock icon next to the name
-				self.sprite_renderer.render(LockedIcon(INNER_LEFT, el_pos[1])) 
+				self.sprite_renderer.render(LockedIcon(INNER_LEFT, LINE_HEIGHT * i)) 
 			
 			elif line.file_path in completed:		
 				# Get the completeion percentage
@@ -273,13 +304,13 @@ class LevelPickerScreen(Screen):
 				el = self.level_text_renderer.render(line_text, el_pos, color=colors.MID_GREEN, hover_color=colors.PALE_GREEN)
 				
 				# Render a Completed icon to the left of the name
-				self.sprite_renderer.render(CompletedIcon(INNER_LEFT, el_pos[1])) 
+				self.sprite_renderer.render(CompletedIcon(INNER_LEFT, LINE_HEIGHT * i)) 
 			
 			elif line.file_path in failed:
 				el = self.level_text_renderer.render(line.name, el_pos, color=colors.RED, hover_color=colors.TOMATO)
 				
 				# Render a Failed icon to the left of the name
-				self.sprite_renderer.render(FailedIcon(INNER_LEFT, el_pos[1])) 
+				self.sprite_renderer.render(FailedIcon(INNER_LEFT, LINE_HEIGHT * i)) 
 			
 			else: # Just render a standard level line
 				el = self.level_text_renderer.render(line.name, el_pos, color=colors.SILVER)
@@ -290,5 +321,5 @@ class LevelPickerScreen(Screen):
 		# Render special links
 		self.back_button = self.sprite_renderer.render(BackIcon(self.screen_size[0] - self.screen_size[0]/8, self.screen_size[1]/8))
 		
-		quit_pos = (self.screen_size[0] - fonts.LINK_TEXT_SIZE * 4, self.screen_size[1] - fonts.LINK_TEXT_SIZE * 2)
-		self.quit_button = self.link_text_renderer.render(resources.QUIT_GAME, quit_pos, color=colors.LIGHT_GRAY, hover_color=colors.SILVER)
+		next_link_pos = (self.screen_size[0] - fonts.LINK_TEXT_SIZE * 4, self.screen_size[1] - fonts.LINK_TEXT_SIZE * 2)
+		self.next_button = self.link_text_renderer.render(resources.NEXT_LEVEL_PAGE, next_link_pos, color=colors.LIGHT_GRAY, hover_color=colors.SILVER)
