@@ -321,5 +321,7 @@ class LevelPickerScreen(Screen):
 		# Render special links
 		self.back_button = self.sprite_renderer.render(BackIcon(self.screen_size[0] - self.screen_size[0]/8, self.screen_size[1]/8))
 		
-		next_link_pos = (self.screen_size[0] - fonts.LINK_TEXT_SIZE * 4, self.screen_size[1] - fonts.LINK_TEXT_SIZE * 2)
-		self.next_button = self.link_text_renderer.render(resources.NEXT_LEVEL_PAGE, next_link_pos, color=colors.LIGHT_GRAY, hover_color=colors.SILVER)
+		# Render the More button if there is more.
+		if not self._is_last_page:
+			next_link_pos = (self.screen_size[0] - fonts.LINK_TEXT_SIZE * 4, self.screen_size[1] - fonts.LINK_TEXT_SIZE * 2)
+			self.next_button = self.link_text_renderer.render(resources.NEXT_LEVEL_PAGE, next_link_pos, color=colors.LIGHT_GRAY, hover_color=colors.SILVER)
