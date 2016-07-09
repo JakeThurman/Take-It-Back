@@ -263,10 +263,9 @@ class LevelPickerScreen(Screen):
 			# Return the actual line
 			yield line
 			
-			if i == len(self.level_lines): 
+			if i == len(self.level_lines) - 1:
 				self._is_last_page = True
-
-		
+	
 	def render(self, refresh_time):
 		# Set the backgroud color
 		self.shape_renderer.render_rect((0, 0, self.screen_size[0], self.screen_size[1]), color=colors.DARK_GRAY)
