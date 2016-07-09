@@ -128,12 +128,7 @@ class PauseMenuScreen(Screen):
 			self._screen_manager.go_back()
 			self._screen_manager.go_back()
 			self._restart_func()
-		
-		# Exit whole game
-		elif self._quit_button.is_hovered:
-			pygame.quit()
-			sys.exit()
-		
+				
 		# Resume level (unpause)
 		elif self._continue_bttn.is_hovered:
 			self._screen_manager.go_back()
@@ -157,7 +152,7 @@ class PauseMenuScreen(Screen):
 	def _get_pos(self, n):
 		"""Returns a position tuple for a option line n about the bottom of the screen
 		"""
-		return (self.screen_size[0]/8, self.screen_size[1]-(n*self.screen_size[1]/8))
+		return (self.screen_size[0]/9, self.screen_size[1]-(n*self.screen_size[1]/9)-self.screen_size[1]/14)
 	
 	def render(self, refresh_time):
 		"""Renders the pause screen
@@ -171,15 +166,14 @@ class PauseMenuScreen(Screen):
 		pygame.mouse.set_visible(True)	
 				
 		# The position for the "you won/lost" message
-		pos = (self.screen_size[0]/10, self.screen_size[1]/10)
+		pos = (self.screen_size[0]/8, self.screen_size[1]/8)
 		
 		# Render the "you won/lost" message
 		self.option_renderer.render(resources.PAUSED_MESSAGE.format(self.level_name), pos, color=colors.WHITE, hover_color=colors.WHITE)
 		
 		# Render the links at the bottom (pick a level and play again)
-		self._continue_bttn   = self.option_renderer.render(resources.CONTINUE_GAME, self._get_pos(6), color=colors.SILVER)
-		self._view_map_bttn   = self.option_renderer.render(resources.VIEW_MAP, self._get_pos(5), color=colors.SILVER)
+		self._continue_bttn   = self.option_renderer.render(resources.CONTINUE_GAME, self._get_pos(5), color=colors.SILVER)
 		self._restart         = self.option_renderer.render(resources.RESTART_LEVEL, self._get_pos(4), color=colors.SILVER)
-		self._settings_bttn   = self.option_renderer.render(resources.SETTINGS, self._get_pos(3), color=colors.SILVER)
-		self._return_to_level = self.option_renderer.render(resources.RETURN_TO_LEVEL_PICKER, self._get_pos(2), color=colors.SILVER)
-		self._quit_button     = self.option_renderer.render(resources.QUIT_GAME, self._get_pos(1), color=colors.SILVER)
+		self._view_map_bttn   = self.option_renderer.render(resources.VIEW_MAP, self._get_pos(3), color=colors.SILVER)
+		self._settings_bttn   = self.option_renderer.render(resources.SETTINGS, self._get_pos(2), color=colors.SILVER)
+		self._return_to_level = self.option_renderer.render(resources.RETURN_TO_LEVEL_PICKER, self._get_pos(1), color=colors.SILVER)

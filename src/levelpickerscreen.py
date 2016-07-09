@@ -78,6 +78,8 @@ class LevelPickerScreen(Screen):
 		self.screen_size = screen_size
 		self._page = page
 		
+		self.next_button = None
+		
 		# Initialize the levels and there titles by scanning the data 
 		# file and going in and loading all of the package members
 		if _cached_level_lines == None:
