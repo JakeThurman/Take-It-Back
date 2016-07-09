@@ -96,7 +96,7 @@ class PauseMenuScreen(Screen):
 	"""A level is paused. Give the user the option to quit, restart etc.
 	"""
 
-	def __init__(self, surface, screen_size, screen_manager, level_name, return_to_picker_screen_func, restart_func):
+	def __init__(self, surface, screen_size, screen_manager, level_name, return_to_picker_screen_func, restart_func, view_map_func):
 		"""Constructor
 		"""
 		super(PauseMenuScreen, self).__init__()
@@ -109,29 +109,44 @@ class PauseMenuScreen(Screen):
 		self.screen_size = screen_size
 		self._screen_manager = screen_manager
 		self.level_name = level_name
-		self.return_to_picker_screen_func = return_to_picker_screen_func
-		self.restart_func = restart_func
+		self._return_to_picker_screen_func = return_to_picker_screen_func
+		self._restart_func = restart_func
+		self._view_map_func = view_map_func
 		
-		# Locals
-		self._went_to_settings = False
+		# State
+		self._went_to_screen = False
 	
 	def handle_click(self):
 		"""Handles a click event
 		"""
-		if self.return_to_level.is_hovered:
-			self.return_to_picker_screen_func()
-		elif self.restart.is_hovered:
+		# Choose a new level
+		if self._return_to_level.is_hovered:
+			self._return_to_picker_screen_func()
+		
+		# Restart current level
+		elif self._restart.is_hovered:
 			self._screen_manager.go_back()
 			self._screen_manager.go_back()
-			self.restart_func()
-		elif self.quit_button.is_hovered:
+			self._restart_func()
+		
+		# Exit whole game
+		elif self._quit_button.is_hovered:
 			pygame.quit()
 			sys.exit()
-		elif self.continue_bttn.is_hovered:
+		
+		# Resume level (unpause)
+		elif self._continue_bttn.is_hovered:
 			self._screen_manager.go_back()
-		elif self.settings_bttn.is_hovered:
+		
+		# Edit settings
+		elif self._settings_bttn.is_hovered:
 			self._screen_manager.set(SettingsScreen)
-			self._went_to_settings = True
+			self._went_to_screen = True
+		
+		# Browse/Explore/View Whole Map
+		elif self._view_map_bttn.is_hovered:
+			self._view_map_func()
+			self._went_to_screen = True
 	
 	def handle_key_up(self, key):
 		"""When the user presses the ESC key, we want to go back to the game.
@@ -149,21 +164,22 @@ class PauseMenuScreen(Screen):
 		"""
 	
 		# Set the backgroud color
-		alpha = None if self._went_to_settings else 30
+		alpha = None if self._went_to_screen else 30
 		self.shape_renderer.render_rect((0, 0, self.screen_size[0], self.screen_size[1]), color=colors.MID_GRAY, alpha=alpha)
 		
 		# Show the mouse on the pause screen
 		pygame.mouse.set_visible(True)	
 				
 		# The position for the "you won/lost" message
-		pos = (self.screen_size[0]/8, self.screen_size[1]/8)
+		pos = (self.screen_size[0]/10, self.screen_size[1]/10)
 		
 		# Render the "you won/lost" message
 		self.option_renderer.render(resources.PAUSED_MESSAGE.format(self.level_name), pos, color=colors.WHITE, hover_color=colors.WHITE)
 		
 		# Render the links at the bottom (pick a level and play again)
-		self.continue_bttn   = self.option_renderer.render(resources.CONTINUE_GAME, self._get_pos(5), color=colors.SILVER)
-		self.restart         = self.option_renderer.render(resources.RESTART_LEVEL, self._get_pos(4), color=colors.SILVER)
-		self.settings_bttn   = self.option_renderer.render(resources.SETTINGS, self._get_pos(3), color=colors.SILVER)
-		self.return_to_level = self.option_renderer.render(resources.RETURN_TO_LEVEL_PICKER, self._get_pos(2), color=colors.SILVER)
-		self.quit_button     = self.option_renderer.render(resources.QUIT_GAME, self._get_pos(1), color=colors.SILVER)
+		self._continue_bttn   = self.option_renderer.render(resources.CONTINUE_GAME, self._get_pos(6), color=colors.SILVER)
+		self._view_map_bttn   = self.option_renderer.render(resources.VIEW_MAP, self._get_pos(5), color=colors.SILVER)
+		self._restart         = self.option_renderer.render(resources.RESTART_LEVEL, self._get_pos(4), color=colors.SILVER)
+		self._settings_bttn   = self.option_renderer.render(resources.SETTINGS, self._get_pos(3), color=colors.SILVER)
+		self._return_to_level = self.option_renderer.render(resources.RETURN_TO_LEVEL_PICKER, self._get_pos(2), color=colors.SILVER)
+		self._quit_button     = self.option_renderer.render(resources.QUIT_GAME, self._get_pos(1), color=colors.SILVER)

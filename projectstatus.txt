@@ -6,7 +6,6 @@ Project TODOs/Ideas:
 		- Should jumping on baddie's heads kill them?
 	
 	- Features:
-		- Mini-map
 		- Overlain in-depth (real) turorial level.
 		- In-game level editor
 		- Package import/export

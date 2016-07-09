@@ -20,6 +20,10 @@ RESTART_LEVEL = "Restart"
 COMPLETION_PERCENTAGE = "You scored {0}%"
 CONTINUE_GAME = "Continue"
 PAUSED_MESSAGE = """"{0}" is Paused"""
+VIEW_MAP = "Explore Map"
+
+# Explore Level Screen
+DONE_EXPLORING = "Done Exploring"
 
 # Settings
 JUMP_KEY_NAME = "Jump"

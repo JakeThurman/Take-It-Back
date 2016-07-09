@@ -1,5 +1,4 @@
 # Jacob Thurman
-# Jacob Thurman
 # Side Scroller Game Screen
 
 from __future__ import division # Floating point division for python 2
@@ -10,6 +9,7 @@ from world import Level, Ring
 from settingsmanager import Keys
 from levelstatescreens import PauseMenuScreen
 from pygame.locals import *
+from levelviewerscreen import MapViewerScreen
 
 class _settings:
 	# Camera should move by thid number of pixels when it adjusts.
@@ -87,7 +87,8 @@ class LevelScreen(Screen):
 		
 		# Create a camera object
 		level_size = self.my_level.get_size()
-		self.camera = Camera(surface, self.my_level.player.rect, level_size[0], level_size[1], _settings.CAMERA_ADJUST_PIXELS)
+		self._camera_factory = lambda rect: Camera(surface, rect, level_size[0], level_size[1], _settings.CAMERA_ADJUST_PIXELS)
+		self.camera = self._camera_factory(self.my_level.player.rect)
 		
 		# Create dependencies and overlay renderers
 		self.sprite_renderer = SpriteRenderer(surface)
@@ -116,7 +117,7 @@ class LevelScreen(Screen):
 	def handle_key_up(self, key):
 		self._handle_key_change(key, False)
 		
-		# if this is the escaple key, quit the game
+		# if this is the escape key, quit the game
 		if key == K_ESCAPE:
 			self._pause_game()
 	
@@ -124,8 +125,12 @@ class LevelScreen(Screen):
 	def handle_key_down(self, key):
 		self._handle_key_change(key, True)
 	
+	def _explore_map(self):
+		self._screen_manager.set(lambda *args: MapViewerScreen(*args, level=self.my_level, camera_factory=self._camera_factory))
+	
 	def _pause_game(self):
-		self._screen_manager.set(lambda surface, screen_size, screen_manager: PauseMenuScreen(surface, screen_size, screen_manager, self.level_title, self._return_to_picker_func, self._restart_me_func))
+		self._screen_manager.set(lambda surface, screen_size, screen_manager: 
+			PauseMenuScreen(surface, screen_size, screen_manager, self.level_title, self._return_to_picker_func, self._restart_me_func, self._explore_map))
 	
 	def _add_entity(self, bullet):
 		self.my_level.all_sprite.add(bullet)
@@ -186,6 +191,3 @@ class LevelScreen(Screen):
 		# If there are any rings (named stars TODO rename) render the ring count at the top
 		if self.my_level.total_stars != 0:
 			self.level_rings.render(self.screen_size[0] - self.screen_size[0]/64, self.screen_size[1]/64, self.my_level.total_stars, self.my_level.stars)
-				
-		# Update the pygame display
-		pygame.display.flip()
