@@ -8,7 +8,7 @@
 
 ; Define the Entry Points
 [Files]
-Source: "build\exe.win32-2.7\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs      
+Source: "build\exe.win-amd64-2.7\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs      
 Source: "..\src\images\*"; DestDir: "{app}\images"; Flags: ignoreversion recursesubdirs createallsubdirs                    
 Source: "..\src\fonts\*"; DestDir: "{app}\fonts"; Flags: ignoreversion
 Source: "appdata\*"; DestDir: "{userappdata}/{#AppName}"; Flags: ignoreversion
