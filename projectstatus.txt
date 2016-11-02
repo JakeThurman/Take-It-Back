@@ -17,4 +17,3 @@ Project TODOs/Ideas:
 	
 	- Requirements:
 		- Create more levels.
-		- Make level picker screen scroll so you >~10 levels
