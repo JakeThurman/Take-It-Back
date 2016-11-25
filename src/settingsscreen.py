@@ -2,10 +2,14 @@
 """
 from __future__ import division # Floating point division for python 2
 import colors, resources, settingsmanager, fonts, textwrapping
+from settingsmanager import Keys
 from rendering import *
 from screen import Screen
 from pygame.locals import *
 from icons import BackIcon
+from imgsetpickerscreen import ImgSetPickerScreen, get_pack_data
+
+VALUE_X_OFFSET = 315
 
 class SettingsScreen(Screen):
 	"""Allows the user to choose settings such as the key mappings
@@ -26,10 +30,15 @@ class SettingsScreen(Screen):
 		self.shape_renderer = ShapeRenderer(surface)
 		
 		self.edit_key = None
+		
+		self._pack_data = get_pack_data()
 	
 	def handle_click(self):
 		if self.back_bttn.is_hovered():
 			self._screen_manager.go_back()
+			
+		if self.edit_key == None and self.img_pack_bttn.is_hovered:
+			self._screen_manager.set(ImgSetPickerScreen);
 			
 		for item in self.settings:
 			if item[0].is_hovered:
@@ -60,14 +69,20 @@ class SettingsScreen(Screen):
 				
 		# Render the settings		
 		i = 1
-		for key, title, value in settingsmanager.get_user_settings():
+		for key, title, value in settingsmanager.get_key_settings():
 			self.option_renderer.render(title, (40, i * 40), color=colors.SILVER, hover_color=colors.SILVER)
-			rend = self.option_renderer.render(pygame.key.name(value).title(), (250, i * 40))
+			rend = self.option_renderer.render(pygame.key.name(value).title(), (VALUE_X_OFFSET, i * 40))
 			i += 1
 			
 			# Store the rendered setting object again
 			self.settings.append((rend, key, title))
+		
+		# Render special settings
+		self.option_renderer.render(resources.IMAGE_PACK, (40, i * 40), color=colors.SILVER, hover_color=colors.SILVER)
 			
+		
+		pack_title = self._pack_data[settingsmanager.get_user_setting(Keys.SETTING_IMG_SET)]
+		self.img_pack_bttn = self.option_renderer.render(pack_title, (VALUE_X_OFFSET, i * 40))
 		# If we are in edit mode we need to render the overlay		
 		if self.edit_key != None:		
 			self.shape_renderer.render_rect((ss[0] / 6, ss[1] / 6, ss[0] - ss[0] / 3, ss[1] - ss[1] / 3), color=colors.WHITE)
@@ -75,4 +90,3 @@ class SettingsScreen(Screen):
 			edit_text = textwrapping.wrapline(resources.PRESS_TO_CHANGE_KEY.format(self.edit_key[2]), self._font, ss[0] - ss[0] / 2)
 			for i, line in enumerate(edit_text):
 				self.option_renderer.render(line, (ss[0] / 4, ss[1] / 3 + (i - 1) * (self._font_size * 1.5)), color=colors.BLACK, hover_color=colors.BLACK)
-

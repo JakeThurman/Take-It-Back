@@ -94,7 +94,7 @@ _user_settings_text = {
 	Keys.SETTING_RIGHT_KEY: resources.MOVE_RIGHT_KEY_NAME
 }
 
-def get_user_settings():
+def get_key_settings():
 	"""Generates a "list" of Tuples: <key, title, value> for each of the keys in _user_settings_text
 	"""
 	for key in _user_settings_text.keys():
