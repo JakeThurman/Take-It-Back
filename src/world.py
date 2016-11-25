@@ -4,8 +4,14 @@
 
 from __future__ import division # Floating point division for python 2
 import pygame, random
+import settingsmanager
+from settingsmanager import Keys
 from rendering import Sprite
 import globals as g
+
+def _get_path(img_name):
+	image_set = settingsmanager.get_user_setting(Keys.SETTING_IMG_SET)
+	return g.ROOT_PATH + "images/packs/{0}/{1}.png".format(image_set, img_name)
 
 class WallOpenDir:
 	# "Enum" constant values.
@@ -20,11 +26,11 @@ class WallOpenDir:
 	def get_file_name(dir):
 		# We start with a map object...
 		map = {
-			WallOpenDir.NONE: g.ROOT_PATH + "images/world/wall.png",
-			WallOpenDir.LEFT_ONLY: g.ROOT_PATH + "images/world/left_only.png",
-			WallOpenDir.RIGHT_ONLY: g.ROOT_PATH + "images/world/right_only.png",
-			WallOpenDir.UP_ONLY: g.ROOT_PATH + "images/world/up_only.png",
-			WallOpenDir.DOWN_ONLY: g.ROOT_PATH + "images/world/down_only.png",
+			WallOpenDir.NONE: _get_path("wall"),
+			WallOpenDir.LEFT_ONLY: _get_path("left_only"),
+			WallOpenDir.RIGHT_ONLY: _get_path("right_only"),
+			WallOpenDir.UP_ONLY: _get_path("up_only"),
+			WallOpenDir.DOWN_ONLY: _get_path("down_only"),
 		}
 		# Then return the needed value.
 		return map[dir]
@@ -65,7 +71,7 @@ class WinBlock(Sprite):
 	"""
 	def __init__(self, x, y):
 		# Init the parent class
-		super(WinBlock, self).__init__(x, y, g.ROOT_PATH + "images/world/win_block.png")
+		super(WinBlock, self).__init__(x, y, _get_path("win_block"))
 		
 class HealthPack(Sprite):
 	"""
@@ -74,7 +80,7 @@ class HealthPack(Sprite):
 	"""
 	def __init__(self, x, y):
 		# Init the parent class
-		super(HealthPack, self).__init__(x, y, g.ROOT_PATH + "images/world/health_pack.png")
+		super(HealthPack, self).__init__(x, y, _get_path("health_pack"))
 		
 class Ring(Sprite):
 	"""
@@ -83,7 +89,7 @@ class Ring(Sprite):
 	"""
 	def __init__(self, x, y, grayscale=False):
 		# Init the parent class
-		super(Ring, self).__init__(x, y, g.ROOT_PATH + "images/world/ring_grayscale.png" if grayscale else g.ROOT_PATH + "images/world/ring.png", use_alpha=True)
+		super(Ring, self).__init__(x, y, _get_path("ring_grayscale" if grayscale else "ring"), use_alpha=True)
 		
 class Weapon(Sprite):
 	"""
@@ -92,7 +98,7 @@ class Weapon(Sprite):
 	"""	
 	def __init__(self, x, y, power):
 		# Init the parent class
-		super(Weapon, self).__init__(x, y, g.ROOT_PATH + "images/world/weapon.png", use_alpha=True)
+		super(Weapon, self).__init__(x, y, _get_path("weapon"), use_alpha=True)
 		# Don't let users pass through these blocks
 		self.dir = WallOpenDir.NONE
 		# Store the power
@@ -128,7 +134,7 @@ class Spawner(Sprite):
 	
 	def __init__(self, x, y, power):
 		# Init the parent class
-		super(Spawner, self).__init__(x, y, g.ROOT_PATH + "images/world/spawner.png", use_alpha=True)
+		super(Spawner, self).__init__(x, y, _get_path("spawner"), use_alpha=True)
 		# Don't let users pass through these blocks
 		self.dir = WallOpenDir.NONE
 		# Store the power
@@ -178,7 +184,7 @@ class Bullet(Sprite):
 	# C'tor
 	def __init__(self, x, y, right, maker, power):
 		# Call the parent c'tor
-		super(Bullet, self).__init__(x, y, g.ROOT_PATH + "images/world/laser.png", use_alpha=True)
+		super(Bullet, self).__init__(x, y, _get_path("laser"), use_alpha=True)
 		
 		# Store other info
 		self.direction_is_right = right
@@ -271,7 +277,7 @@ class Baddie(LivingThing):
 	def __init__(self, x, y, maker, power, before_death_func):		
 		"""Constructor"""
 		# Call the parent c'tor
-		super(Baddie, self).__init__(x, y, g.ROOT_PATH + "images/actions/baddie_idle.png", use_alpha=True)
+		super(Baddie, self).__init__(x, y, _get_path("baddie_idle"), use_alpha=True)
 		
 		# Initialize other locals
 		self.maker = maker
@@ -289,7 +295,7 @@ class Baddie(LivingThing):
 		
 	def _set_dying(self):
 		self._is_dying = True
-		self.image = pygame.image.load(g.ROOT_PATH + "images/actions/baddie_dying.png").convert_alpha()
+		self.image = pygame.image.load(_get_path("baddie_dying")).convert_alpha()
 		
 	def add_time(self, refresh_time):
 		# Increment the the lifetime counter
@@ -367,16 +373,9 @@ class Player(LivingThing):
 	# C'tor
 	def __init__(self, x, y, initial_health):
 		# Store the names of all of the images
-		self._images =  { 
-			"run_left": g.ROOT_PATH + "images/actions/run_left.png",
-			"run_right": g.ROOT_PATH + "images/actions/run_right.png",
-			"idle_left": g.ROOT_PATH + 'images/actions/idle_left.png',
-			"idle_right": g.ROOT_PATH + 'images/actions/idle_right.png',
-			"jump_left": g.ROOT_PATH + "images/actions/jump_left.png",
-			"jump_right": g.ROOT_PATH + "images/actions/jump_right.png",
-			"down_left": g.ROOT_PATH + "images/actions/down_left.png",
-			"down_right": g.ROOT_PATH + "images/actions/down_right.png"
-		}
+		self._images = {}
+		for key in ("run_left", "run_right", "idle_left", "idle_right", "jump_left", "jump_right", "down_left", "down_right"):
+			self._images[key] = _get_path(key);
 		
 		# Call the parent c'tor
 		super(Player, self).__init__(x, y, self._images["idle_right"], use_alpha=True)

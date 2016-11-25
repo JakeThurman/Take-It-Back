@@ -11,7 +11,8 @@
     "jump": 273, 
     "left": 276,
     "crouch": 274, 
-    "right": 275
+    "right": 275,
+	"img_set": "stick"
   }, 
   "unlocked": [
   ]

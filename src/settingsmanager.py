@@ -60,6 +60,9 @@ class Keys:
 	SETTING_LEFT_KEY = "left"
 	# data.json: The json key for the move right key settings
 	SETTING_RIGHT_KEY = "right"
+	
+	# data.json: The json item specifying the selected player image set
+	SETTING_IMG_SET = "img_set"
 
 # Loads the JSON once. Effectivly a singleton because it is in the root of the module
 with open(Keys.JSON_DATA_FILE_PATH, "r") as data_file:    
