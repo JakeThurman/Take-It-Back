@@ -17,14 +17,15 @@ class ImgSetPickerScreen(Screen):
 	"""Allows the user to choose the image set setting
 	"""
 	
-	def __init__(self, surface, screen_size, screen_manager):
+	def __init__(self, data):
 		"""Constructor
 		"""
 		# Store given values
-		self._screen_size = screen_size
-		self._screen_manager = screen_manager
+		self._screen_size = data.get_screen_size()
+		self._screen_manager = data.get_screen_manager()
 		
 		# Create dependencies
+		surface = data.get_surface()
 		self.sprite_renderer = SpriteRenderer(surface)
 		self.option_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=30))
 		self.shape_renderer = ShapeRenderer(surface)
@@ -64,10 +65,15 @@ class ImgSetPickerScreen(Screen):
 		for pack_key in sorted(self._packs_data.keys()):
 			pack_title = self._packs_data[pack_key]
 		
+			# Draw a background for the example img
+			self.shape_renderer.render_rect((28, (i * 80) - 44, 37, 67), color=colors.SILVER)
+
+			# Draw the example img of the pack
 			sprite = Sprite(30, (i * 80) - 40, g.ROOT_PATH + "images/packs/" + pack_key + "/idle_right.png", use_alpha=True)
 			self.sprite_renderer.render(sprite)
 			
-			text_rend = self.option_renderer.render(pack_title, (80, (i * 80) - 30))  # 50 if (i % 2 == 0) else 100, int(i/2) * 40
+			# Print the name of the pack
+			text_rend = self.option_renderer.render(pack_title, (80, (i * 80) - 30), color=colors.SILVER)
 			
 			self._options.append((text_rend, pack_key))
 						

@@ -23,12 +23,12 @@ def main():
 	
 	# Initialize the window
 	screen_size = (700, 500)
-	DISPLAYSURF = pygame.display.set_mode(screen_size, 0, 32)
+	surface = pygame.display.set_mode(screen_size, 0, 32)
 	pygame.display.set_caption(resources.GAME_TITLE)
 	
 	# Create a screen manager object
 	# This will handle switching from screen to screen for us
-	manager = ScreenManager(DISPLAYSURF, screen_size)
+	manager = ScreenManager(surface, screen_size)
 	
 	# We want to start with the launcher screen
 	manager.set(lambda *args: LaunchScreen(*args, picker_screen_factory=LevelPickerScreen))

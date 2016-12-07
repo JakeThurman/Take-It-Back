@@ -128,29 +128,41 @@ class SpriteRenderer(object):
 class Camera(object):
 	"""Class for centering the screen on the player
 	"""
-	def __init__(self, surface, player, level_width, level_height, pixes_to_adjust_by):
+	def __init__(self, surface_rect, eye, level_width, level_height, slack_x, slack_y):
 		"""C'tor
 		"""
-		self.player = player
-		self.sprite_renderer = SpriteRenderer(surface)
-		self.rect = surface.get_rect()
-		self.rect.center = self.player.center
-		self.world_rect = pygame.Rect(0, 0, level_width, level_height)
-		self.pixes_to_adjust_by = pixes_to_adjust_by
+		
+		self.rect = surface_rect
+		self.rect.center = eye.center
+		self._eye = eye
+		self._world_rect = pygame.Rect(0, 0, level_width, level_height)
+		self._slack_x = slack_x
+		self._slack_y = slack_y
 
 	def update(self):
 		"""Adjusts each side to follow the player
 		"""
-		if self.player.centerx > self.rect.centerx + self.pixes_to_adjust_by:
-			self.rect.centerx = self.player.centerx - self.pixes_to_adjust_by
-		if self.player.centerx < self.rect.centerx - self.pixes_to_adjust_by:
-			self.rect.centerx = self.player.centerx + self.pixes_to_adjust_by
-		if self.player.centery > self.rect.centery + self.pixes_to_adjust_by:
-			self.rect.centery = self.player.centery - self.pixes_to_adjust_by
-		if self.player.centery < self.rect.centery - self.pixes_to_adjust_by:
-			self.rect.centery = self.player.centery + self.pixes_to_adjust_by
-			self.rect.clamp_ip(self.world_rect)
-	
+		camera_x, camera_y = self.rect.center
+		eye_x, eye_y = self._eye.center
+
+		# Update the horizonal camera position
+		if camera_x - eye_x > self._slack_x:
+			camera_x = eye_x + self._slack_x
+		elif eye_x - camera_x > self._slack_x:
+			camera_x = eye_x - self._slack_x
+					
+		# Update the vertical camera position
+		if camera_y - eye_y > self._slack_y:
+			camera_y = eye_y + self._slack_y
+		elif eye_y - camera_y > self._slack_y:
+			camera_y = eye_y - self._slack_y
+			
+		# Update the rect 
+		self.rect.center = (camera_x, camera_y)
+		
+		# Clamp to the borders of the world.
+		self.rect.clamp_ip(self._world_rect)
+		
 	def convert_rect_for_render(self, rect):
 		"""Defines a rectangle positioned relitive to the camera position
 		"""

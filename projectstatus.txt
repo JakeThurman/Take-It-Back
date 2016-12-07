@@ -2,26 +2,26 @@ Key: - Unplanned
      * 1.0 Requirement
 
 # Project TODOs/Ideas:
-	- BUGS:
+	BUGS:
 		- Baddies sometimes fall out of screen
 	
-	- Mechanic Ideas:
+	Mechanic Ideas:
 		- Should jumping on baddie's heads kill them?
 		- Give player a weapon
 	
-	- Feature Ideas:
+	Feature Ideas:
 		- Overlain in-depth (real) turorial level.
 		- In-game level editor
 		- Package import/export
 		- Multiplayer
 
-	- Other:
+	Other:
 		- Support Full Screen Mode
 		* Add Sound Effects & BG music.
-		* Fix camera jerking by adding "Camera Slack"
 
-	- Requirements:
+	Requirements:
 		* More Levels
 	
-	- Code Improvements
+	Code Improvements
 		- Unit Tests
+		- Improve "Screen" framework

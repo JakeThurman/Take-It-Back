@@ -15,14 +15,15 @@ class SettingsScreen(Screen):
 	"""Allows the user to choose settings such as the key mappings
 	"""
 	
-	def __init__(self, surface, screen_size, screen_manager):
+	def __init__(self, data):
 		"""Constructor
 		"""
 		# Store given values
-		self.screen_size = screen_size
-		self._screen_manager = screen_manager
+		self.screen_size = data.get_screen_size()
+		self._screen_manager = data.get_screen_manager()
 		
 		# Create dependencies
+		surface = data.get_surface()
 		self.sprite_renderer = SpriteRenderer(surface)
 		self._font_size = 30
 		self._font = fonts.OPEN_SANS(size=self._font_size)
@@ -55,6 +56,10 @@ class SettingsScreen(Screen):
 			settingsmanager.update_user_setting(self.edit_key[1], key)
 			self.edit_key = None
 	
+	def _render_option(self, title, value, i):
+		self.option_renderer.render(title, (40, i * 40), color=colors.WHITE, hover_color=colors.WHITE)
+		return self.option_renderer.render(value, (VALUE_X_OFFSET, i * 40), color=colors.SILVER)
+	
 	def render(self, refresh_time):
 		ss = self.screen_size
 			
@@ -70,19 +75,16 @@ class SettingsScreen(Screen):
 		# Render the settings		
 		i = 1
 		for key, title, value in settingsmanager.get_key_settings():
-			self.option_renderer.render(title, (40, i * 40), color=colors.SILVER, hover_color=colors.SILVER)
-			rend = self.option_renderer.render(pygame.key.name(value).title(), (VALUE_X_OFFSET, i * 40))
+			rend = self._render_option(title, pygame.key.name(value).title(), i)
 			i += 1
 			
 			# Store the rendered setting object again
 			self.settings.append((rend, key, title))
 		
 		# Render special settings
-		self.option_renderer.render(resources.IMAGE_PACK, (40, i * 40), color=colors.SILVER, hover_color=colors.SILVER)
-			
-		
 		pack_title = self._pack_data[settingsmanager.get_user_setting(Keys.SETTING_IMG_SET)]
-		self.img_pack_bttn = self.option_renderer.render(pack_title, (VALUE_X_OFFSET, i * 40))
+		self.img_pack_bttn = self._render_option(resources.IMAGE_PACK, pack_title, i)
+		
 		# If we are in edit mode we need to render the overlay		
 		if self.edit_key != None:		
 			self.shape_renderer.render_rect((ss[0] / 6, ss[1] / 6, ss[0] - ss[0] / 3, ss[1] - ss[1] / 3), color=colors.WHITE)

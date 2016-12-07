@@ -9,18 +9,20 @@ from settingsmanager import Keys
 from rendering import SpriteRenderer, ShapeRenderer, OptionRenderer
 
 class MapViewerScreen(Screen):
-	def __init__(self, surface, screen_size, screen_manager, level, camera_factory):
+	def __init__(self, data, level, camera_factory):
 		""" C'tor for the screen.
 		"""
 		
 		# Store injected dependencies
-		self._screen_size = screen_size
-		self._screen_manager = screen_manager
+		self._screen_size = data.get_screen_size()
+		self._screen_manager = data.get_screen_manager()
 		self._level = level
 		
 		# Create and store custom dependencies
 		self._eye = pygame.Rect(level.player.rect.x, level.player.rect.y, level.player.rect.w, level.player.rect.h)
 		self._camera = camera_factory(self._eye)
+		
+		surface = data.get_surface()
 		self._shape_renderer = ShapeRenderer(surface)
 		self._sprite_renderer = SpriteRenderer(surface)
 		self._option_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=30))
@@ -57,7 +59,6 @@ class MapViewerScreen(Screen):
 		
 	def _return_to_level(self):
 		self._screen_manager.go_back() # To Pause Screen
-		self._screen_manager.go_back() # Return to game
 	
 	def handle_click(self):
 		"""Handles a click event

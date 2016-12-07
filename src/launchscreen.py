@@ -16,20 +16,21 @@ class LaunchScreen(Screen):
 	"""Renderers the splash screen
 	"""
 
-	def __init__(self, surface, screen_size, screen_manager, picker_screen_factory):
+	def __init__(self, data, picker_screen_factory):
 		"""Constructor
 		"""
 		# init parent class
 		super(LaunchScreen, self).__init__()
 		
 		# Create dependencies
+		surface = data.get_surface()
 		self.shape_renderer = ShapeRenderer(surface)
 		self.sprite_renderer = SpriteRenderer(surface)
 		self.option_renderer = OptionRenderer(surface, fonts.OPEN_SANS())
 		
 		# Store settings
-		self.screen_size = screen_size
-		self._screen_manager = screen_manager
+		self.screen_size = data.get_screen_size()
+		self._screen_manager = data.get_screen_manager()
 		self._picker_screen_factory = picker_screen_factory
 		
 	def handle_click(self):

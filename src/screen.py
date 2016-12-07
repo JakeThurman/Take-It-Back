@@ -4,6 +4,8 @@ Screen Helper Classes
 
 import pygame, sys
 from pygame.locals import K_ESCAPE
+from gamedata import Data
+
 
 class Screen(object):
 	"""Handles and exposes common screen actions
@@ -48,8 +50,7 @@ class ScreenManager(object):
 	def __init__(self, surface, screen_size):
 		"""Constructor
 		"""
-		self.surface = surface
-		self.screen_size = screen_size
+		self._data = Data(surface, screen_size, SafeScreenManager(self))
 		self.prev = []
 		self.curr = None
 	
@@ -66,7 +67,7 @@ class ScreenManager(object):
 		if self.curr != None:
 			self.prev.append(self.curr)
 		# Create the new screen
-		self.curr = factory(self.surface, self.screen_size, SafeScreenManager(self))
+		self.curr = factory(self._data)
 		# Throw an exception if the factory returned an invalid result
 		assert self.curr != None
 	

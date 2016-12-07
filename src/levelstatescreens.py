@@ -12,19 +12,20 @@ class EndGameScreen(Screen):
 	"""The game has ended here is what we say...
 	"""
 	
-	def __init__(self, surface, screen_size, screen_manager, is_win, play_again_func, completion_percentage=None):
+	def __init__(self, data, is_win, play_again_func, completion_percentage=None):
 		"""Constructor
 		"""
 	
 		super(EndGameScreen, self).__init__()
 		
 		# Create Depndencies
+		surface = data.get_surface()
 		self.option_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=30))
 		self.shape_renderer = ShapeRenderer(surface)
 		
 		# Store settings and callbacks
-		self.screen_size = screen_size
-		self._screen_manager = screen_manager
+		self.screen_size = data.get_screen_size()
+		self._screen_manager = data.get_screen_manager()
 		self.is_win = is_win # TODO: move special win handling out to GameWonScreen and GameLostScreen
 		self.completion_percentage = completion_percentage
 		self.play_again_func = play_again_func
@@ -83,31 +84,32 @@ class EndGameScreen(Screen):
 class GameWonScreen(EndGameScreen):
 	"""Win specific overload of the EndGameScreen
 	"""
-	def __init__(self, surface, screen_size, screen_manager, play_again_func, completion_percentage):
-		super(GameWonScreen, self).__init__(surface, screen_size, screen_manager, True, play_again_func, completion_percentage=completion_percentage)
+	def __init__(self, data, play_again_func, completion_percentage):
+		super(GameWonScreen, self).__init__(data, True, play_again_func, completion_percentage=completion_percentage)
 	
 class GameLostScreen(EndGameScreen):
 	"""Loss specific overload of the EndGameScreen
 	"""
-	def __init__(self, surface, screen_size, screen_manager, play_again_func):
-		super(GameLostScreen, self).__init__(surface, screen_size, screen_manager, False, play_again_func)
+	def __init__(self, data, play_again_func):
+		super(GameLostScreen, self).__init__(data, False, play_again_func)
 
 class PauseMenuScreen(Screen):
 	"""A level is paused. Give the user the option to quit, restart etc.
 	"""
 
-	def __init__(self, surface, screen_size, screen_manager, level_name, return_to_picker_screen_func, restart_func, view_map_func):
+	def __init__(self, data, level_name, return_to_picker_screen_func, restart_func, view_map_func):
 		"""Constructor
 		"""
 		super(PauseMenuScreen, self).__init__()
 		
 		# Create Depndencies
+		surface = data.get_surface()
 		self.option_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=30))
 		self.shape_renderer = ShapeRenderer(surface)
 		
 		# Store settings and callbacks
-		self.screen_size = screen_size
-		self._screen_manager = screen_manager
+		self.screen_size = data.get_screen_size()
+		self._screen_manager = data.get_screen_manager()
 		self.level_name = level_name
 		self._return_to_picker_screen_func = return_to_picker_screen_func
 		self._restart_func = restart_func

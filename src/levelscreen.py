@@ -16,7 +16,8 @@ class _settings:
 	# This nubmer should be low enough to dis-allow jerkiness when 
 	# quickly moving up/down, but also low enough to avoid jerking
 	# when the player jumps, and trying to rerender that each time
-	CAMERA_ADJUST_PIXELS = 25 
+	SLACK_X = 40
+	SLACK_Y = 30
 
 class HealthBar:
 	"""The side scroll game status bar
@@ -69,15 +70,15 @@ class LevelScreen(Screen):
 	
 	# Constructor
 	# NOTE: This c'tor is not a legal Screen.ScreenManger factory
-	def __init__(self, surface, screen_size, screen_manager, level_title, level_file, player_health, win_func, lose_func, return_to_picker_func, restart_me_func):	
+	def __init__(self, data, level_title, level_file, player_health, win_func, lose_func, return_to_picker_func, restart_me_func):	
 		super(LevelScreen, self).__init__()	
 		
-		# Store the passed in values (we don't surface as a global)
-		self.screen_size = screen_size
+		# Store props
+		self.screen_size = data.get_screen_size()
 		self.level_title = level_title
 		self._on_win_func = win_func
 		self._on_lose_func = lose_func
-		self._screen_manager = screen_manager
+		self._screen_manager = data.get_screen_manager()
 		self._return_to_picker_func = return_to_picker_func
 		self._restart_me_func = restart_me_func
 				
@@ -86,14 +87,15 @@ class LevelScreen(Screen):
 		self.my_level.init()
 		
 		# Create a camera object
+		surface = data.get_surface()
 		level_size = self.my_level.get_size()
-		self._camera_factory = lambda rect: Camera(surface, rect, level_size[0], level_size[1], _settings.CAMERA_ADJUST_PIXELS)
+		self._camera_factory = lambda rect: Camera(surface.get_rect(), rect, level_size[0], level_size[1], _settings.SLACK_X, _settings.SLACK_Y)
 		self.camera = self._camera_factory(self.my_level.player.rect)
 		
 		# Create dependencies and overlay renderers
 		self.sprite_renderer = SpriteRenderer(surface)
 		self.shape_renderer = ShapeRenderer(surface)
-		self.health_bar = HealthBar(self.shape_renderer, screen_size, self.my_level.player)
+		self.health_bar = HealthBar(self.shape_renderer, self.screen_size, self.my_level.player)
 		self.level_rings = LevelRings(self.sprite_renderer)
 		
 		# Initialize key handling
@@ -129,8 +131,7 @@ class LevelScreen(Screen):
 		self._screen_manager.set(lambda *args: MapViewerScreen(*args, level=self.my_level, camera_factory=self._camera_factory))
 	
 	def _pause_game(self):
-		self._screen_manager.set(lambda surface, screen_size, screen_manager: 
-			PauseMenuScreen(surface, screen_size, screen_manager, self.level_title, self._return_to_picker_func, self._restart_me_func, self._explore_map))
+		self._screen_manager.set(lambda *args: PauseMenuScreen(*args, level_name=self.level_title, return_to_picker_screen_func=self._return_to_picker_func, restart_func=self._restart_me_func, view_map_func=self._explore_map))
 	
 	def _add_entity(self, bullet):
 		self.my_level.all_sprite.add(bullet)

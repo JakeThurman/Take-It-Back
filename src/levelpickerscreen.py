@@ -61,12 +61,13 @@ LINE_HEIGHT = 30
 class LevelPickerScreen(Screen):
 	"""Handles picking a side scroller game"""
 	
-	def __init__(self, surface, screen_size, screen_manager, page=0, _cached_level_lines=None):		
+	def __init__(self, data, page=0, _cached_level_lines=None):		
 		"""Constructor
 		"""
 		super(LevelPickerScreen, self).__init__()
-	
+		
 		# Create rendering dependencies
+		surface = data.get_surface()
 		self.package_text_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=31), do_hover=False)
 		self.level_text_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=25))
 		self.link_text_renderer = OptionRenderer(surface, fonts.OPEN_SANS())
@@ -74,8 +75,8 @@ class LevelPickerScreen(Screen):
 		self.sprite_renderer = SpriteRenderer(surface)
 		
 		# Store passed in values as needed
-		self._screen_manager = screen_manager
-		self.screen_size = screen_size
+		self._screen_manager = data.get_screen_manager()
+		self.screen_size = data.get_screen_size()
 		self._page = page
 		
 		self.next_button = None
@@ -161,8 +162,8 @@ class LevelPickerScreen(Screen):
 			self._screen_manager.go_back() # Returns from the pause menu to the game
 			self._screen_manager.go_back() # Returns from the game to the level picker
 		
-		# Now set the screen to the chosen level!
-		self._screen_manager.set(lambda surface, screen_size, screen_manager: LevelScreen(surface, screen_size, screen_manager, data.name, data.file_path, data.player_health, win, lose, quit, restart))
+		# Now set the screen to the chosen level!		
+		self._screen_manager.set(lambda *args: LevelScreen(*args, level_title=data.name, level_file=data.file_path, player_health=data.player_health, win_func=win, lose_func=lose, return_to_picker_func=quit, restart_me_func=restart))
 	
 	def _add_to_failed(self, data):
 		def update_json_data(json):		
@@ -212,12 +213,12 @@ class LevelPickerScreen(Screen):
 			
 		# Show the end game screeen
 		completion_percentage = self._calculate_completion_percentage(my_rings, total_rings, my_health, data.player_health)
-		self._screen_manager.set(lambda surface, screen_size, screen_manager: GameWonScreen(surface, screen_size, screen_manager, lambda: self._play_level_again(data), completion_percentage))
+		self._screen_manager.set(lambda *args: GameWonScreen(*args, play_again_func=lambda: self._play_level_again(data), completion_percentage=completion_percentage))
 		
 	def _on_level_lost(self, data):		
 		self._add_to_failed(data)
 		# Show the end game screen
-		self._screen_manager.set(lambda surface, screen_size, screen_manager: GameLostScreen(surface, screen_size, screen_manager, lambda: self._play_level_again(data)))
+		self._screen_manager.set(lambda *args: GameLostScreen(*args, play_again_func=lambda: self._play_level_again(data)))
 		
 	def _play_level_again(self, data):
 		self._screen_manager.go_back()
