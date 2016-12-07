@@ -4,20 +4,26 @@ Key: - Unplanned
 # Project TODOs/Ideas:
 	BUGS:
 		- Baddies sometimes fall out of screen
+		- Speed is based on FPS rather than time...
+		- ImgSetPickerScreen should paginate since it loads dynamic content.
+			|-> Factor out a PageinatedScreen class from LevelPickerScreen
 	
 	Mechanic Ideas:
-		- Should jumping on baddie's heads kill them?
+		- Should jumping on baddie's heads kill them? - people often think it will
 		- Give player a weapon
 	
 	Feature Ideas:
 		- Overlain in-depth (real) turorial level.
 		- In-game level editor
 		- Package import/export
-		- Multiplayer
+		- Multiplayer (PvP?)
 
 	Other:
 		- Support Full Screen Mode
+		- Support Resize
+		- Pause Icon on Game Screen
 		* Add Sound Effects & BG music.
+		* Improve Current Texture Packs
 
 	Requirements:
 		* More Levels
@@ -25,3 +31,4 @@ Key: - Unplanned
 	Code Improvements
 		- Unit Tests
 		- Improve "Screen" framework
+		- Implement new content structure for .map files.
