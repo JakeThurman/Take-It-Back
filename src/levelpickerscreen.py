@@ -1,5 +1,5 @@
 """
-	This file includes the SideScrollLevelPickerScreen class 
+	This file includes the LevelPickerScreen class 
 	and all of the components it exclusivly requires
 
 """
@@ -15,6 +15,7 @@ from levelstatescreens import GameWonScreen, GameLostScreen
 from levelscreen import LevelScreen
 from launchscreen import LaunchScreen
 from icons import BackIcon
+from paging import PagingHandler
 
 class Consts:
 	"""Constant Settings
@@ -40,7 +41,11 @@ class LockedIcon(Sprite):
 	
 # Helper class, for getting named valus for level links (and header)
 class LevelLine:
-	def __init__(self, name, is_header = False, file_path=None, player_health=None, locked=False, unlocks=[]):
+	@staticmethod
+	def spacer():
+		return LevelLine("", is_header=False)
+
+	def __init__(self, name, is_header=False, file_path=None, player_health=None, locked=False, unlocks=[]):
 		self.name = name
 		self.is_header = is_header
 		self.file_path = file_path
@@ -51,7 +56,6 @@ class LevelLine:
 		
 	def set_el(self, el):
 		self.el = el
-	
 
 # line-sizing constants
 INNER_LEFT = 30
@@ -73,6 +77,7 @@ class LevelPickerScreen(Screen):
 		self.link_text_renderer = OptionRenderer(surface, fonts.OPEN_SANS())
 		self.shape_renderer = ShapeRenderer(surface)
 		self.sprite_renderer = SpriteRenderer(surface)
+		self._paging_handler = PagingHandler(data.get_screen_size, LINE_HEIGHT)
 		
 		# Store passed in values as needed
 		self._screen_manager = data.get_screen_manager()
@@ -100,6 +105,8 @@ class LevelPickerScreen(Screen):
 				# Load the package json
 				level_package_data = json.load(level_package)
 				
+				# Insert spacing line
+				level_lines.append(LevelLine.spacer())
 				level_lines.append(LevelLine(level_package_data[Keys.PACKAGE_NAME_KEY], is_header = True))
 				
 				# Now create a line for each actual level.
@@ -143,7 +150,7 @@ class LevelPickerScreen(Screen):
 		unlocked_levels = settingsmanager.use_json(lambda json: json[Keys.UNLOCKED_LEVELS_KEY])
 		
 		# Find the valid element that is at that position
-		clicked = [ll for ll in self._get_lines_for_page() if not ll.is_header and ll.el.is_hovered and (not ll.locked or ll.file_path in unlocked_levels)]
+		clicked = [ll for ll in self._get_lines() if not ll.is_header and ll.el.is_hovered and (not ll.locked or ll.file_path in unlocked_levels)]
 		
 		# If the user didn't click on anything, don't do anything
 		if len(clicked) != 1:
@@ -243,32 +250,12 @@ class LevelPickerScreen(Screen):
 		# The completeion percentage is the average of the two percentages
 		return int((ring_percentage + health_percentage)/2)
 		
-	def _get_lines_for_page(self):
-		lines_per_page = (self.screen_size[1] / LINE_HEIGHT) - 1
+	def _get_lines(self):
+		return self._paging_handler.filter_items(self.level_lines, self._page)
 		
-		min = (self._page) * lines_per_page
-		max = (self._page + 1) * lines_per_page
-	
-		self._is_last_page = False
-		headers_so_far = 0
+	def _is_last_page(self):
+		return self._paging_handler.is_last_page(self.level_lines, self._page)
 		
-		for i, line in enumerate(self.level_lines):
-			if line.is_header:
-				headers_so_far += 1
-		
-			if (i + headers_so_far) >= max: break # We're done!
-			if (i + headers_so_far) < min:	continue # Not there yet...
-				
-			if line.is_header:
-				# Return a blank line for sizing
-				yield LevelLine("", is_header=True)
-			
-			# Return the actual line
-			yield line
-			
-			if i == len(self.level_lines) - 1:
-				self._is_last_page = True
-	
 	def render(self, refresh_time):
 		# Set the backgroud color
 		self.shape_renderer.render_rect((0, 0, self.screen_size[0], self.screen_size[1]), color=colors.DARK_GRAY)
@@ -280,8 +267,7 @@ class LevelPickerScreen(Screen):
 		completed = settingsmanager.use_json(lambda json: json[Keys.COMPLETED_LEVELS_KEY])
 		failed = settingsmanager.use_json(lambda json: json[Keys.FAILED_LEVELS_KEY])
 		
-		# Render each line
-		for i, line in enumerate(self._get_lines_for_page()):
+		for i, line in enumerate(self._get_lines()):
 			el_pos = (INNER_LEFT if line.is_header else OUTER_LEFT, LINE_HEIGHT * (i - (0.5 if line.is_header else 0.25)))
 			
 			# Render the line appropriately
@@ -324,6 +310,6 @@ class LevelPickerScreen(Screen):
 		self.back_button = self.sprite_renderer.render(BackIcon(self.screen_size[0] - self.screen_size[0]/8, self.screen_size[1]/8))
 		
 		# Render the More button if there is more.
-		if not self._is_last_page:
+		if not self._is_last_page():
 			next_link_pos = (self.screen_size[0] - fonts.LINK_TEXT_SIZE * 4, self.screen_size[1] - fonts.LINK_TEXT_SIZE * 2)
-			self.next_button = self.link_text_renderer.render(resources.NEXT_LEVEL_PAGE, next_link_pos, color=colors.LIGHT_GRAY, hover_color=colors.SILVER)
+			self.next_button = self.link_text_renderer.render(resources.NEXT_PAGE, next_link_pos, color=colors.LIGHT_GRAY, hover_color=colors.SILVER)

@@ -5,8 +5,6 @@ Key: - Unplanned
 	BUGS:
 		- Baddies sometimes fall out of screen
 		- Speed is based on FPS rather than time...
-		- ImgSetPickerScreen should paginate since it loads dynamic content.
-			|-> Factor out a PageinatedScreen class from LevelPickerScreen
 	
 	Mechanic Ideas:
 		- Should jumping on baddie's heads kill them? - people often think it will
