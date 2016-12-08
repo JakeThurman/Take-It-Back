@@ -19,7 +19,6 @@ class ImgSetPickerScreen(Screen):
 	"""Allows the user to choose the image set setting
 	"""
 	LINE_HEIGHT = 80
-	TEXT_SIZE = 30
 	
 	def __init__(self, data, page=0):
 		"""Constructor
@@ -34,9 +33,9 @@ class ImgSetPickerScreen(Screen):
 		
 		# Create dependencies
 		surface = data.get_surface()
-		self.sprite_renderer = SpriteRenderer(surface)
-		self.option_renderer = OptionRenderer(surface, fonts.OPEN_SANS(size=self.TEXT_SIZE))
-		self.shape_renderer = ShapeRenderer(surface)
+		self._sprite_renderer = SpriteRenderer(surface)
+		self._option_renderer = OptionRenderer(surface, fonts.OPEN_SANS())
+		self._shape_renderer = ShapeRenderer(surface)
 		self._paging_handler = PagingHandler(data.get_screen_size, self.LINE_HEIGHT)
 		
 		# Initial state
@@ -59,10 +58,12 @@ class ImgSetPickerScreen(Screen):
 				self._screen_manager.go_back()
 		
 	def handle_key_up(self, key):
-		# Escape should mean return
+		# Escape should mean go back to the settings screen
 		if key == K_ESCAPE:
-			self._screen_manager.go_back()
-	
+			# Go back through all of the pages.
+			for i in range(self._page):
+				self._screen_manager.go_back()
+		
 	def _get_items(self):
 		return self._paging_handler.filter_items(sorted(self._packs_data.keys()), self._page)
 	
@@ -73,15 +74,15 @@ class ImgSetPickerScreen(Screen):
 		ss = self._screen_size
 			
 		# Set the backgroud color
-		self.shape_renderer.render_rect((0, 0, ss[0], ss[1]), color=colors.DARK_GRAY)
+		self._shape_renderer.render_rect((0, 0, ss[0], ss[1]), color=colors.DARK_GRAY)
 		
 		# Render the back button
-		self._back_bttn = self.sprite_renderer.render(BackIcon(ss[0] - ss[0]/8, ss[1]/8))
+		self._back_bttn = self._sprite_renderer.render(BackIcon(ss[0] - ss[0]/8, ss[1]/8))
 		
 		# Render the next page button if needed
 		if not self._is_last_page():	
-			next_link_pos = (ss[0] - self.TEXT_SIZE * 4, ss[1] - self.TEXT_SIZE * 2)
-			self._next_bttn = self.option_renderer.render(resources.NEXT_PAGE, next_link_pos, color=colors.LIGHT_GRAY, hover_color=colors.SILVER)
+			next_link_pos = (ss[0] - fonts.LINK_TEXT_SIZE * 4, ss[1] - fonts.LINK_TEXT_SIZE * 2)
+			self._next_bttn = self._option_renderer.render(resources.NEXT_PAGE, next_link_pos, color=colors.LIGHT_GRAY, hover_color=colors.SILVER)
 		
 		# Reset the stored settings
 		self._options = []
@@ -90,13 +91,13 @@ class ImgSetPickerScreen(Screen):
 			pack_title = self._packs_data[pack_key]
 		
 			# Draw a background for the example img
-			self.shape_renderer.render_rect((28, (i * self.LINE_HEIGHT) + 36, 37, 67), color=colors.SILVER)
+			self._shape_renderer.render_rect((28, (i * self.LINE_HEIGHT) + 21, 37, 67), color=colors.SILVER)
 
 			# Draw the example img of the pack
-			sprite = Sprite(30, (i * self.LINE_HEIGHT) + 40, g.ROOT_PATH + "images/packs/" + pack_key + "/idle_right.png", use_alpha=True)
-			self.sprite_renderer.render(sprite)
+			sprite = Sprite(30, (i * self.LINE_HEIGHT) + 25, g.ROOT_PATH + "images/packs/" + pack_key + "/idle_right.png", use_alpha=True)
+			self._sprite_renderer.render(sprite)
 			
 			# Print the name of the pack
-			text_rend = self.option_renderer.render(pack_title, (80, (i * self.LINE_HEIGHT) + 50), color=colors.SILVER)
+			text_rend = self._option_renderer.render(pack_title, (80, (i * self.LINE_HEIGHT) + 35), color=colors.SILVER)
 			
 			self._options.append((text_rend, pack_key))

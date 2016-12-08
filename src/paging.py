@@ -1,3 +1,10 @@
+
+# When making somthing paginated:
+#  1. Add a paging variable/PagingHandler instance
+#  2. Use this calss to handle filtering
+#  3. Add a {resources.NEXT_PAGE} link 'if not is_last_page()'
+#  4. Don't make the user go back through all of the pages for ESC
+#
 class PagingHandler(object):
 	def __init__(self, get_screen_size, line_height):
 		self._get_screen_size = get_screen_size
