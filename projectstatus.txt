@@ -22,8 +22,6 @@ Key: - Unplanned
 		- Pause Icon on Game Screen
 		* Add Sound Effects & BG music.
 		* Improve Current Texture Packs
-
-	Requirements:
 		* More Levels
 	
 	Code Improvements
