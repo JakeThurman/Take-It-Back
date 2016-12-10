@@ -61,6 +61,9 @@ class World(object):
 		self.rooms = list((list((None for __ in range(height))) for _ in range(width)))
 		self.ordered_rooms = []
 	
+	def get_dimensions(self):
+		return(self._width, self._height)
+	
 	def init_at(self, point, rm):
 		x, y = point
 		self.rooms[x][y] = rm
@@ -73,7 +76,8 @@ class World(object):
 	def fill_empty_spaces(self, room_height, room_width):
 		for x in range(self._width):
 			for y in range(self._height):
-				self.rooms[x][y] = EmptyRoom((x, y), room_height, room_width)
+				if self.rooms[x][y] == None:
+					self.rooms[x][y] = EmptyRoom((x, y), room_height, room_width)
 			
 		
 class PathFinder(object):
@@ -118,10 +122,12 @@ class RoomFiller(object):
 		return self._path_finder.find_any_path(start_point, end_point, min_distance, action, is_valid=world.has_point)		
 	
 	def add_air_to_room(self, room, start_point, end_point, min_distance):
-		#TODO: Fix this method. It almost always usually fails.
+		#TODO: Fix this method. It almost always fails.
 		validator = RoomExcavationValidator(start_point, room.has_point)
 		
-		return self._path_finder.find_any_path(start_point, end_point, min_distance, action=room.make_air, is_valid=validator.is_valid_cut)	
+		action = Utils.call_all(room.make_air, validator.mark_point)
+		
+		return self._path_finder.find_any_path(start_point, end_point, min_distance, action, is_valid=validator.is_valid_cut)	
 
 class RoomExcavationValidator(object):
 	def __init__(self, start_point, is_otherwise_valid):
@@ -130,22 +136,22 @@ class RoomExcavationValidator(object):
 		self._last_movement_was_up = False
 		self._prev_last_mvmt_was_up = False
 	
-	def is_valid_cut(self, point):
-		# Just return false now if the other checks fail
-		if not self._is_otherwise_valid(point):
-			return False
-	
-		# Don't let the pathfinder go upwards more than twice!!
-		if self._prev_last_mvmt_was_up and self._last_movement_was_up and self._last_point[1] < point[1]:
-			return False
-		
+	def mark_point(self, point):
 		# Update the "last" variables for the next call
 		self._prev_last_mvmt_was_up = self._last_movement_was_up
 		self._last_movement_was_up = self._last_point[1] < point[1]
 		self._last_point = point
+	
+	def is_valid_cut(self, point):
+		# Just return false now if the other checks fail
+		if not self._is_otherwise_valid(point):
+			return False
 		
-		return True
-		
+		# Don't let the pathfinder go upwards more than twice!!
+		would_be_3_ups = self._prev_last_mvmt_was_up and self._last_movement_was_up and self._last_point[1] < point[1]
+				
+		return not would_be_3_ups
+	
 class Utils(object):
 	@staticmethod
 	def windowed(lst):
@@ -164,30 +170,25 @@ class Utils(object):
 		
 		return '\n'.join(map(lambda lst: ''.join(lst), stringified_items))
 		
+	@staticmethod
+	def call_all(*funcs):
+		def action(*args, **kwargs):
+			for func in funcs:
+				func(*args, **kwargs)
 		
+		return action
+		
+	@staticmethod	
+	def joing_strings_horizontally(left, right):
+		zipped = zip(left.splitlines(), right.splitlines())
+		mapped = map("".join, zipped)
+		return '\n'.join(mapped)
+	
 class WorldGenerator(object):
 	def __init__(self, room_filler, error_handler):
 		self._room_filler = room_filler
 		self._error_handler = error_handler
 	
-	def _mark_path_from(self, point1, point2):
-		pass # TODO
-	
-	def _mark_solution_path(self, world):	
-		for room, next_room in Utils.windowed(world.ordered_rooms):
-			point1 = random.choice(list(room.get_all_points()))
-			point2 = random.choice(list(next_room.get_all_points()))
-			
-			cursor = point1
-			
-			# TODO: Unfinished loop
-			while list(cursor) != list(point2):
-				old_cursor = cursor
-				cursor = (point1[0], cursor[1])
-				self._mark_path_from(old_cursor, cursor)
-			
-			cursor = (cursor[0], point2[1])
-			
 	def _get_actions(self, world):
 			room_height=10
 			room_width=10
@@ -196,7 +197,7 @@ class WorldGenerator(object):
 			
 			for room in world.ordered_rooms:
 				name = "Excavate Room @{0}".format(room.get_location())
-				yield (name, lambda: self._room_filler.add_air_to_room(room, (5, 0), (5, 9), 4))
+				yield (name, lambda: self._room_filler.add_air_to_room(room, start_point=(5, 0), end_point=(5, 9), min_distance=4))
 				
 			yield ("Fill empty space on Map with blank rooms", lambda: world.fill_empty_spaces(room_height, room_width))
 		
@@ -220,9 +221,26 @@ class ErrorHandler(object):
 		
 class WorldConverter(object):
 	def to_map_file_content(self, world):
-		stringified_rooms = Utils.map2D(lambda room: Utils.convert2Dtostr(room.cells), world.rooms)
+		rooms = Utils.map2D(lambda room: Utils.convert2Dtostr(room.cells), world.rooms)
+		
+		rows = self._get_row_strings(world, rooms)
+		
+		return "\n".join(rows)
+	
+	def _get_row_strings(self, world, rooms):
+		num_cols, num_rows = world.get_dimensions()
+
+		for y in range(num_rows):
+			curr_row = ""
+		
+			for x in range(num_cols):
+				if curr_row == "":
+					curr_row = rooms[x][y]
 				
-		return Utils.convert2Dtostr(stringified_rooms)
+				curr_row = Utils.joing_strings_horizontally(curr_row, rooms[x][y])
+				
+			yield curr_row
+		
 		
 class FileWritter(object):
 	def write_to_file(self, content, file_path):
@@ -241,7 +259,8 @@ class Program(object):
 		if my_world != None:
 			content = self._world_converter.to_map_file_content(my_world)
 			self._file_writter.write_to_file(content, "output.map")
-		
+			
+			
 if __name__ == "__main__":
 	Program().main()
 	
