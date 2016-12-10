@@ -205,10 +205,11 @@ class Utils(object):
 	@staticmethod
 	def border_string(txt, border_char):
 		lines = txt.splitlines()		
-				
+		
+		top_bottom_border = border_char * (max(map(len, lines)) + 2) # Plus 2 for the added characters in we add to the sides
+		
 		left_right_bordered = (border_char + line + border_char for line in lines)
-		top_bottom_border = border_char * max(map(len, left_right_bordered))
-				
+		
 		return top_bottom_border + '\n' + '\n'.join(left_right_bordered) + '\n' + top_bottom_border
 		
 		
