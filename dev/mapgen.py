@@ -183,6 +183,35 @@ class Utils(object):
 		zipped = zip(left.splitlines(), right.splitlines())
 		mapped = map("".join, zipped)
 		return '\n'.join(mapped)
+		
+	@staticmethod
+	def remove_blank_lines(txt):
+		return "\n".join(filter(lambda line: line.strip() != "", txt.splitlines()))
+		
+	@staticmethod
+	def multiply_str(txt, x_multiplier, y_multiplier):
+		lines = txt.splitlines()
+		
+		output = ""
+		for line in lines:		
+			for _ in range(y_multiplier):
+				for letter in line:
+					for __ in range(x_multiplier):
+						output += letter
+				output += "\n"
+				
+		return output
+		
+	@staticmethod
+	def border_string(txt, border_char):
+		lines = txt.splitlines()		
+				
+		left_right_bordered = (border_char + line + border_char for line in lines)
+		top_bottom_border = border_char * max(map(len, left_right_bordered))
+				
+		return top_bottom_border + '\n' + '\n'.join(left_right_bordered) + '\n' + top_bottom_border
+		
+		
 	
 class WorldGenerator(object):
 	def __init__(self, room_filler, error_handler):
@@ -225,7 +254,11 @@ class WorldConverter(object):
 		
 		rows = self._get_row_strings(world, rooms)
 		
-		return "\n".join(rows)
+		initial_map = Utils.remove_blank_lines("\n".join(rows))
+		
+		multiplied_world = Utils.multiply_str(initial_map, x_multiplier=3, y_multiplier=2)
+		
+		return Utils.border_string(multiplied_world, "X")
 	
 	def _get_row_strings(self, world, rooms):
 		num_cols, num_rows = world.get_dimensions()
