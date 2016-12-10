@@ -125,7 +125,7 @@ class RoomFiller(object):
 		#TODO: Fix this method. It almost always fails.
 		validator = RoomExcavationValidator(start_point, room.has_point)
 		
-		action = Utils.call_all(room.make_air, validator.mark_point)
+		action = Utils.combine_funcs(room.make_air, validator.mark_point)
 		
 		return self._path_finder.find_any_path(start_point, end_point, min_distance, action, is_valid=validator.is_valid_cut)	
 
@@ -171,7 +171,7 @@ class Utils(object):
 		return '\n'.join(map(lambda lst: ''.join(lst), stringified_items))
 		
 	@staticmethod
-	def call_all(*funcs):
+	def combine_funcs(*funcs):
 		def action(*args, **kwargs):
 			for func in funcs:
 				func(*args, **kwargs)
