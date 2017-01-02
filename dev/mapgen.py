@@ -206,7 +206,7 @@ class Utils(object):
 	def border_string(txt, border_char):
 		lines = txt.splitlines()		
 		
-		top_bottom_border = border_char * (max(map(len, lines)) + 2) # Plus 2 for the added characters in we add to the sides
+		top_bottom_border = border_char * (max(map(len, lines)) + 2*len(border_char)) # Plus 2 for the added characters in we add to the sides
 		
 		left_right_bordered = (border_char + line + border_char for line in lines)
 		
