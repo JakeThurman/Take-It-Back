@@ -6,7 +6,7 @@ Dependencies:
  1. [Python 2.7](https://www.python.org/downloads/release/python-2712/)
  2. [Pygame 1.9.1 for Python 2.7](http://www.pygame.org/download.shtml)
  3. [Inno Setup](http://www.jrsoftware.org/isdl.php)
- 4. [cx_Freeze](https://pypi.python.org/pypi/cx_Freeze) (*pip install cx_Freeze*)
+ 4. [cx_Freeze](https://pypi.python.org/pypi/cx_Freeze) (`pip install cx_Freeze`)
 
 Install steps
  1. `git clone` this repo
